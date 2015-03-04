@@ -1,0 +1,495 @@
+<?xml version="1.0"?>
+
+<schema>
+
+	<table name="Customer">
+
+		<file name="customer_tbl.dbt">
+			<size>12000000</size>
+			<blocks>2942</blocks>
+			<structure></structure>
+		</file>
+
+		<attributes>
+			<attribute name="ID">
+				<type>BigInt</type>
+				<key-status>Primary</key-status>
+				<size>8</size>
+				
+				<attribute-statistics>
+					<min-value>1</min-value>
+					<max-value>100001</max-value>
+					<unique-values>100000</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+			<attribute name="cname">
+				<type>Character</type>
+				<key-status>None</key-status>
+				<size>50</size>
+				
+				<attribute-statistics>
+					<min-value>Achilles</min-value>
+					<max-value>Zoro</max-value>
+					<unique-values>500</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+			<attribute name="csurname">
+				<type>Character</type>
+				<key-status>None</key-status>
+				<size>50</size>
+				
+				<attribute-statistics>
+					<min-value>Antonius</min-value>
+					<max-value>Zico</max-value>
+					<unique-values>10000</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+			<attribute name="age">
+				<type>Integer</type>
+				<key-status>None</key-status>
+				<size>4</size>
+				
+				<attribute-statistics>
+					<min-value>18</min-value>
+					<max-value>77</max-value>
+					<unique-values>50</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+			
+			<attribute name="nationality_fk">
+				<type>BigInt</type>
+				<key-status>Foreign</key-status>
+				<size>8</size>
+				
+				<reference>
+					<attribute>ID</attribute>
+					<table>Nationality</table>
+				</reference>
+				
+				<attribute-statistics>
+					<min-value>7</min-value>
+					<max-value>23</max-value>
+					<unique-values>13</unique-values>
+				</attribute-statistics>
+			
+			</attribute>
+			
+		</attributes>
+
+
+		<indexes>
+			
+			<index name="customer_id_idx">
+				<attribute>ID</attribute>
+				<type>staticHashing</type>
+				
+				<index-statistics>
+					<distinct-values>100000</distinct-values>
+				</index-statistics>
+			</index>
+						
+			<index name="customer_name_idx">
+				<attribute>csurname</attribute>
+				<type>B+tree</type>
+				
+				<index-statistics>
+					<distinct-values>10000</distinct-values>
+					<Btree-height>3</Btree-height>
+				</index-statistics>
+			</index>
+						
+			<index name="customer_nationalify_idx">
+				<attribute>nationality_fk</attribute>
+				<type>staticHashing</type>
+				
+				<index-statistics>
+					<distinct-values>13</distinct-values>
+				</index-statistics>
+			</index>
+			
+		</indexes>
+		
+		
+		<table-statistics>
+			<cardinality>100000</cardinality>
+			<tuple-size>120</tuple-size>
+			<tuples-per-block>34</tuples-per-block>
+		</table-statistics>
+
+	</table>
+	
+	
+	
+	
+	<table name="Nationality">
+
+		<file name="nationality_tbl.dbt">
+			<size>3600</size>
+			<blocks>1</blocks>
+			<structure></structure>
+		</file>
+
+		<attributes>
+			<attribute name="ID">
+				<type>BigInt</type>
+				<key-status>Primary</key-status>
+				<size>8</size>
+				
+				<attribute-statistics>
+					<min-value>1</min-value>
+					<max-value>101</max-value>
+					<unique-values>100</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+			<attribute name="code">
+				<type>Character</type>
+				<key-status>None</key-status>
+				<size>8</size>
+				
+				<attribute-statistics>
+					<min-value>ARG</min-value>
+					<max-value>ZWE</max-value>
+					<unique-values>100</unique-values>
+				</attribute-statistics>
+			</attribute>
+	
+			<attribute name="description">
+				<type>Character</type>
+				<key-status>None</key-status>
+				<size>20</size>
+				
+				<attribute-statistics>
+					<min-value>ARGENTINA</min-value>
+					<max-value>ZIMBABWE</max-value>
+					<unique-values>100</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+		</attributes>
+
+		<indexes>
+		</indexes>
+		
+		<table-statistics>
+			<cardinality>100</cardinality>
+			<tuple-size>36</tuple-size>
+			<tuples-per-block>113</tuples-per-block>
+		</table-statistics>
+
+	</table>
+	
+	
+	
+	<table name="Product">
+
+		<file name="product_tbl.dbt">
+			<size>760000</size>
+			<blocks>189</blocks>
+			<structure></structure>
+		</file>
+
+		<attributes>
+			<attribute name="ID">
+				<type>BigInteger</type>
+				<key-status>Primary</key-status>
+				<size>8</size>
+				
+				<attribute-statistics>
+					<min-value>1</min-value>
+					<max-value>10001</max-value>
+					<unique-values>10000</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+			<attribute name="pcode">
+				<type>Character</type>
+				<key-status>None</key-status>
+				<size>10</size>
+				
+				<attribute-statistics>
+					<min-value>AA0001</min-value>
+					<max-value>ZZ9999</max-value>
+					<unique-values>10000</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+			<attribute name="pname">
+				<type>Character</type>
+				<key-status>None</key-status>
+				<size>50</size>
+				
+				<attribute-statistics>
+					<min-value>Asparagus</min-value>
+					<max-value>Zwan</max-value>
+					<unique-values>10000</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+			<attribute name="category_fk">
+				<type>BigInteger</type>
+				<key-status>Foreign</key-status>
+				<size>8</size>
+				
+				<reference>
+					<attribute>ID</attribute>
+					<table>Category</table>
+				</reference>
+				
+				<attribute-statistics>
+					<min-value>1</min-value>
+					<max-value>51</max-value>
+					<unique-values>50</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+		</attributes>
+
+		<indexes>
+		
+			<index name="product_id_idx">
+				<attribute>ID</attribute>
+				<type>staticHashing</type>
+				
+				<index-statistics>
+					<distinct-values>10000</distinct-values>
+				</index-statistics>
+			</index>
+			
+			<index name="product_name_idx">
+				<attribute>pname</attribute>
+				<type>B+tree</type>
+				
+				<index-statistics>
+					<distinct-values>10000</distinct-values>
+					<Btree-height>3</Btree-height>
+				</index-statistics>
+			</index>
+			
+			<index name="product_category_idx">
+				<attribute>category_fk</attribute>
+				<type>staticHashing</type>
+				
+				<index-statistics>
+					<distinct-values>50</distinct-values>
+				</index-statistics>
+			</index>
+		</indexes>
+		
+		
+		<table-statistics>
+			<cardinality>10000</cardinality>
+			<tuple-size>76</tuple-size>
+			<tuples-per-block>53</tuples-per-block>
+		</table-statistics>
+		
+
+	</table>
+	
+	
+	
+	
+	<table name="Category">
+
+		<file name="category_tbl.dbt">
+			<size>3400</size>
+			<blocks>1</blocks>
+			<structure></structure>
+		</file>
+
+		<attributes>
+			<attribute name="ID">
+				<type>BigInteger</type>
+				<key-status>Primary</key-status>
+				<size>8</size>
+				
+				<attribute-statistics>
+					<min-value>1</min-value>
+					<max-value>51</max-value>
+					<unique-values>50</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+			<attribute name="cat_name">
+				<type>Character</type>
+				<key-status>None</key-status>
+				<size>50</size>
+				
+				<attribute-statistics>
+					<min-value>Beef</min-value>
+					<max-value>Seafood</max-value>
+					<unique-values>51</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+			<attribute name="cat_code">
+				<type>Character</type>
+				<key-status>None</key-status>
+				<size>10</size>
+				
+				<attribute-statistics>
+					<min-value>001</min-value>
+					<max-value>051</max-value>
+					<unique-values>51</unique-values>
+				</attribute-statistics>
+			</attribute>
+					
+		</attributes>
+
+		<indexes>
+		</indexes>
+		
+		
+		<table-statistics>
+			<cardinality>50</cardinality>
+			<tuple-size>68</tuple-size>
+			<tuples-per-block>60</tuples-per-block>
+		</table-statistics>
+
+	</table>
+
+
+
+	<table name="OrderItem">
+
+		<file name="order_item_tbl.dbt">
+			<size>400000000</size>
+			<blocks>98040</blocks>
+			<structure></structure>
+		</file>
+
+		<attributes>
+		
+			<attribute name="ID">
+				<type>BigInteger</type>
+				<key-status>Primary</key-status>
+				<size>8</size>
+				
+				<attribute-statistics>
+					<min-value>1</min-value>
+					<max-value>10000001</max-value>
+					<unique-values>10000000</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+			<attribute name="price">
+				<type>Integer</type>
+				<key-status>None</key-status>
+				<size>4</size>
+				
+				<attribute-statistics>
+					<min-value>1</min-value>
+					<max-value>10000</max-value>
+					<unique-values>1000</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+			<attribute name="quantity">
+				<type>Integer</type>
+				<key-status>None</key-status>
+				<size>4</size>
+				
+				<attribute-statistics>
+					<min-value>1</min-value>
+					<max-value>1000</max-value>
+					<unique-values>100</unique-values>
+				</attribute-statistics>
+			</attribute>
+			
+			<attribute name="date">
+				<type>Date</type>
+				<key-status>None</key-status>
+				<size>8</size>
+				
+				<attribute-statistics>
+					<min-value>20100101</min-value>
+					<max-value>20150301</max-value>
+					<unique-values>1000</unique-values>
+				</attribute-statistics>
+			</attribute>
+	
+			<attribute name="customer_fk">
+				<type>BigInt</type>
+				<key-status>Foreign</key-status>
+				<size>8</size>
+				
+				<reference>
+					<attribute>ID</attribute>
+					<table>Customer</table>
+				</reference>
+				
+				<attribute-statistics>
+					<min-value>1</min-value>
+					<max-value>100000</max-value>
+					<unique-values>50000</unique-values>
+				</attribute-statistics>
+				
+			</attribute>
+			
+			<attribute name="product_fk">
+				<type>BigInt</type>
+				<key-status>Foreign</key-status>
+				<size>8</size>
+				
+				<reference>
+					<attribute>ID</attribute>
+					<table>Product</table>
+				</reference>
+				
+				<attribute-statistics>
+					<min-value>1</min-value>
+					<max-value>10000</max-value>
+					<unique-values>7500</unique-values>
+				</attribute-statistics>
+				
+			</attribute>			
+		</attributes>
+
+		<indexes>
+		
+			<index name="order_id_idx">
+				<attribute>ID</attribute>
+				<type>staticHashing</type>
+				
+				<index-statistics>
+					<distinct-values>10000000</distinct-values>
+				</index-statistics>
+				
+			</index>
+			
+			<index name="order_product_idx">
+				<attribute>product_fk</attribute>
+				<type>staticHashing</type>
+				
+				<index-statistics>
+					<distinct-values>7500</distinct-values>
+				</index-statistics>
+			</index>
+			
+			<index name="order_customer_idx">
+				<attribute>customer_fk</attribute>
+				<type>staticHashing</type>
+				
+				<index-statistics>
+					<distinct-values>50000</distinct-values>
+				</index-statistics>
+			</index>
+			
+		</indexes>
+		
+		
+		<table-statistics>
+			<cardinality>10000000</cardinality>
+			<tuple-size>40</tuple-size>
+			<tuples-per-block>102</tuples-per-block>
+		</table-statistics>
+
+	</table>
+
+
+</schema>
+
