@@ -1,3 +1,9 @@
+import java.util.HashMap;
+import java.util.Map;
+
+import qpo.data.info.Catalog;
+import qpo.data.model.Attribute;
+import qpo.data.model.Table;
 import ParserGenerator.NumberTypes;
 import ParserGenerator.Parser;
 import ParserGenerator.SyntaxElement;
@@ -444,6 +450,22 @@ public class QueryParser extends Parser {
 		
 		this.addSyntaxElement(table);
 		this.setRootElement(table);
+		
+		Map<String, Object> attributes = new HashMap<String, Object>();
+		
+		Map<String, Table> tables = Catalog.getInstance().getCatalogMap();
+		for ( String key : tables.keySet() ) {
+			Table t = tables.get(key);
+		    relation_t.addSymbol(key, t);
+		    for(Attribute a : t.getAttributes()){
+		    	if(!attributes.containsKey(a.getName()))
+		    		attributes.put(a.getName(), null);
+		    }
+		}
+		for(String a : attributes.keySet()){
+			attribute_t.addSymbol(a, attributes.get(a));
+		}
+		
 	}
 	
 	@Override
