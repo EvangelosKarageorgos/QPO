@@ -1,9 +1,9 @@
 import java.util.HashMap;
 import java.util.Map;
 
-import qpo.data.info.Catalog;
-import qpo.data.model.Attribute;
-import qpo.data.model.Table;
+import qpo.data.info.*;
+import qpo.data.model.*;
+import qpo.processor.*;
 import ParserGenerator.NumberTypes;
 import ParserGenerator.Parser;
 import ParserGenerator.SyntaxElement;
@@ -19,6 +19,22 @@ import ParserGenerator.Token;
 
 
 public class QueryParser extends Parser {
+	
+	private static final int T_LITERAL = 0; 
+	private static final int T_NUMBER = 1; 
+	private static final int T_STRING = 2; 
+	private static final int T_TABLE = 3; 
+	private static final int T_ATTRIBUTE = 4; 
+	private static final int T_RELATION = 5; 
+	private static final int T_JOIN = 6; 
+	private static final int T_SELECT = 7; 
+	private static final int T_PROJECT = 8; 
+	private static final int T_UNION = 9;
+	private static final int T_DIFF = 10;
+	private static final int T_INTERSECT = 11; 
+
+
+	
 	public QueryParser(){
 		init();
 
@@ -74,6 +90,7 @@ public class QueryParser extends Parser {
 				new SyntaxElementChoice()
 					.addElement(
 						new SyntaxElementAny("string")
+							.setTags(new Object[] {T_LITERAL, T_STRING})
 							.setTerminators("'")
 							.setImportant(true)
 					)
@@ -89,6 +106,7 @@ public class QueryParser extends Parser {
 			.setToken(
 				new Token().setNumberTypes(NumberTypes.ANY)
 			)
+			.setTags(new Object[] {T_LITERAL, T_NUMBER})
 			.setDelimiters(delims)
 			.setTerminators(terms);
 		
@@ -146,13 +164,15 @@ public class QueryParser extends Parser {
 			.setToken(relation_t)
 			.setDelimiters(delims)
 			.setTerminators(terms)
-			.setImportant(true);
+			.setImportant(true)
+			.setTags(new Object[]{T_RELATION});
 	
 		SyntaxElement attribute = new SyntaxElementToken("attribute")
 			.setToken(attribute_t)
 			.setDelimiters(delims)
 			.setTerminators(terms)
-			.setImportant(true);
+			.setImportant(true)
+			.setTags(new Object[]{T_ATTRIBUTE});
 
 		SyntaxElementChoice table = new SyntaxElementChoice("table");
 
@@ -351,7 +371,9 @@ public class QueryParser extends Parser {
 					.addElement(popen)
 					.addElement(table)
 					.addElement(pclose)
-			);
+					.setImportant(false)
+			)
+			.setTags(new Object[]{T_SELECT});
 
 		SyntaxElement projection = new SyntaxElementSyntax("project")
 			.addElement(word_proj)
@@ -367,7 +389,9 @@ public class QueryParser extends Parser {
 					.addElement(popen)
 					.addElement(table)
 					.addElement(pclose)
-			);
+					.setImportant(false)
+			)
+			.setTags(new Object[]{T_PROJECT});
 		
 		SyntaxElement join = new SyntaxElementSyntax("join")
 			.addElement(word_join)
@@ -383,13 +407,16 @@ public class QueryParser extends Parser {
 					.addElement(popen)
 					.addElement(table)
 					.addElement(pclose)
+					.setImportant(false)
 			)
 			.addElement(
 				new SyntaxElementSyntax()
 					.addElement(popen)
 					.addElement(table)
 					.addElement(pclose)
-			);
+					.setImportant(false)
+			)
+			.setTags(new Object[]{T_JOIN});
 
 		
 		SyntaxElement intersection = new SyntaxElementSyntax("intersection")
@@ -399,13 +426,16 @@ public class QueryParser extends Parser {
 					.addElement(popen)
 					.addElement(table)
 					.addElement(pclose)
+					.setImportant(false)
 			)
 			.addElement(
 				new SyntaxElementSyntax()
 					.addElement(popen)
 					.addElement(table)
 					.addElement(pclose)
-			);
+					.setImportant(false)
+			)
+			.setTags(new Object[]{T_INTERSECT});
 		
 		SyntaxElement union = new SyntaxElementSyntax("union")
 			.addElement(word_union)
@@ -414,28 +444,34 @@ public class QueryParser extends Parser {
 					.addElement(popen)
 					.addElement(table)
 					.addElement(pclose)
+					.setImportant(false)
 			)
 			.addElement(
 				new SyntaxElementSyntax()
 					.addElement(popen)
 					.addElement(table)
 					.addElement(pclose)
-			);
+					.setImportant(false)
+			)
+			.setTags(new Object[]{T_UNION});
 
-		SyntaxElement difference = new SyntaxElementSyntax("difference")
+		SyntaxElement difference = new SyntaxElementSyntax("diff")
 			.addElement(word_diff)
 			.addElement(
 				new SyntaxElementSyntax()
 					.addElement(popen)
 					.addElement(table)
 					.addElement(pclose)
+					.setImportant(false)
 			)
 			.addElement(
 				new SyntaxElementSyntax()
 					.addElement(popen)
 					.addElement(table)
 					.addElement(pclose)
-			);
+					.setImportant(false)
+			)
+			.setTags(new Object[]{T_DIFF});
 
 		
 		table
@@ -445,7 +481,8 @@ public class QueryParser extends Parser {
 			.addElement(intersection)
 			.addElement(union)
 			.addElement(difference)
-			.addElement(relation);
+			.addElement(relation)
+			.setTags(new Object[]{T_TABLE});
 		
 		
 		this.addSyntaxElement(table);
@@ -472,5 +509,89 @@ public class QueryParser extends Parser {
 	public SyntaxNode recognize(String text){
 		SyntaxNode result = super.recognize(text);
 		return result;
+	}
+	
+	public PlanNode createPlan(String query){
+		SyntaxNode rootNode = this.recognize(query);
+		System.out.println(rootNode);
+		return createPlanTableNode(rootNode);
+	}
+	
+	private PlanTableNode createPlanTableNode(SyntaxNode snode){
+		switch(snode.syntaxElement.name){
+		case "table":
+			return createPlanTableNode(snode.children.get(0));
+		case "project":
+			return createPlanProjectNode(snode);
+		case "join":
+			return createPlanJoinNode(snode);
+		case "select":
+			return createPlanSelectNode(snode);
+		case "union":
+			return createPlanUnionNode(snode);
+		case "diff":
+			return createPlanDiffNode(snode);
+		case "intersect":
+			return createPlanIntersectNode(snode);
+		case "relation":
+			return createPlanRelationNode(snode);
+		default:
+			break;
+		}
+		return new PlanTableNode();
+	}
+
+	private PlanSelectNode createPlanSelectNode(SyntaxNode snode){
+		PlanSelectNode node = new PlanSelectNode();
+		node.table = createPlanTableNode(snode.children.get(1));
+		return node;
+	}
+
+	private PlanProjectNode createPlanProjectNode(SyntaxNode snode){
+		PlanProjectNode node = new PlanProjectNode();
+		node.table = createPlanTableNode(snode.children.get(1));
+		return node;
+	}
+
+	private PlanJoinNode createPlanJoinNode(SyntaxNode snode){
+		PlanJoinNode node = new PlanJoinNode();
+		node.left = createPlanTableNode(snode.children.get(1));
+		node.right = createPlanTableNode(snode.children.get(2));
+		return node;
+	}
+
+	private PlanUnionNode createPlanUnionNode(SyntaxNode snode){
+		PlanUnionNode node = new PlanUnionNode();
+		node.left = createPlanTableNode(snode.children.get(0));
+		node.right = createPlanTableNode(snode.children.get(1));
+		return node;
+	}
+
+	private PlanDiffNode createPlanDiffNode(SyntaxNode snode){
+		PlanDiffNode node = new PlanDiffNode();
+		node.left = createPlanTableNode(snode.children.get(0));
+		node.right = createPlanTableNode(snode.children.get(1));
+		return node;
+	}
+
+	private PlanIntersectNode createPlanIntersectNode(SyntaxNode snode){
+		PlanIntersectNode node = new PlanIntersectNode();
+		node.left = createPlanTableNode(snode.children.get(0));
+		node.right = createPlanTableNode(snode.children.get(1));
+		return node;
+	}
+
+	private PlanRelationNode createPlanRelationNode(SyntaxNode snode){
+		PlanRelationNode node = new PlanRelationNode();
+		Token.TokenResult t = (Token.TokenResult)snode.data;
+		node.relation = (Table)t.data;
+		return node;
+	}
+
+
+	
+	private PlanNode createPlanNode(SyntaxNode snode){
+
+		return new PlanNode();
 	}
 }

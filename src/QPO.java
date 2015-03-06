@@ -1,3 +1,4 @@
+import qpo.processor.*;
 import qpo.test.QPOtester;
 
 
@@ -8,7 +9,9 @@ public class QPO {
 		QPOtester tester = new QPOtester();
 		tester.runQPO();
 		QueryParser parser = new QueryParser();
-		System.out.println(parser.recognize("proj[ID, pname, cat_name](join[Product.category_fk=Category.ID](Product)(Category))"));
+		//System.out.println(parser.recognize("proj[ID, pname, cat_name](join[Product.category_fk=Category.ID](Product)(Category))"));
+		PlanNode plan = parser.createPlan("proj[ID, pname, cat_name](join[Product.category_fk=Category.ID](Product)(Category))");
+		System.out.println("End.");
 	}
 
 }
