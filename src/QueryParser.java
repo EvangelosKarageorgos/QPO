@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import qpo.data.info.*;
@@ -179,11 +181,12 @@ public class QueryParser extends Parser {
 		
 		//---------------Predicate----------------------
 		
-		SyntaxElement comparison = new SyntaxElementChoice("comparison")
-			.addElement(new SyntaxElementWord().setWord("=").setMaxLength(1))
-			.addElement(new SyntaxElementWord().setWord("<>").setMaxLength(2))
-			.addElement(new SyntaxElementWord().setWord(">").setMaxLength(1))
-			.addElement(new SyntaxElementWord().setWord("<").setMaxLength(1))
+		SyntaxElement comparison = new SyntaxElementChoice("comparison-operator")
+			.addElement(new SyntaxElementWord().setWord("=").setMaxLength(1).setName("equals"))
+			.addElement(new SyntaxElementWord().setWord("<>").setMaxLength(2).setName("not-equal"))
+			.addElement(new SyntaxElementWord().setWord(">").setMaxLength(1).setName("greater-than"))
+			.addElement(new SyntaxElementWord().setWord("<").setMaxLength(1).setName("less-than"))
+			.addElement(new SyntaxElementWord().setWord("like").setMaxLength(4).setName("like"))
 			.setDelimiters(delims);
 		
 		SyntaxElementChoice predicate = new SyntaxElementChoice("predicate");
@@ -193,7 +196,7 @@ public class QueryParser extends Parser {
 		
 		SyntaxElement predicateElement = new SyntaxElementChoice()
 			.addElement(
-				new SyntaxElementSyntax()
+				new SyntaxElementSyntax("named-attribute")
 					.addElement(relation)
 					.addElement(dot)
 					.addElement(attribute)
@@ -543,18 +546,24 @@ public class QueryParser extends Parser {
 
 	private PlanSelectNode createPlanSelectNode(SyntaxNode snode){
 		PlanSelectNode node = new PlanSelectNode();
+		node.predicate = createPlanPredicateNode(snode.children.get(0));
 		node.table = createPlanTableNode(snode.children.get(1));
 		return node;
 	}
 
 	private PlanProjectNode createPlanProjectNode(SyntaxNode snode){
 		PlanProjectNode node = new PlanProjectNode();
+		node.projectedAttributes = new ArrayList<PlanAttributeNode>();
+		for(SyntaxNode n : snode.children.get(0).children){
+			node.projectedAttributes.add(createPlanAttributeNode(n));
+		}
 		node.table = createPlanTableNode(snode.children.get(1));
 		return node;
 	}
 
 	private PlanJoinNode createPlanJoinNode(SyntaxNode snode){
 		PlanJoinNode node = new PlanJoinNode();
+		node.predicate = createPlanPredicateNode(snode.children.get(0));
 		node.left = createPlanTableNode(snode.children.get(1));
 		node.right = createPlanTableNode(snode.children.get(2));
 		return node;
@@ -588,8 +597,110 @@ public class QueryParser extends Parser {
 		return node;
 	}
 
-
 	
+	private PlanPredicateNode createPlanPredicateNode(SyntaxNode snode){
+		if(snode.syntaxElement.name.equals("comparison"))
+			return createPlanComparisonNode(snode);
+		if(snode.syntaxElement.name.equals("negative")){
+			PlanNegationNode node = new PlanNegationNode();
+			node.predicate = createPlanPredicateNode(snode.children.get(0));
+			return node;
+		}
+			
+		if(snode.children.size()==1)
+			return createPlanPredicateNode(snode.children.get(0));
+
+		List<PlanPredicateNode> nodes = new ArrayList<PlanPredicateNode>();
+		int i=0;
+		for(SyntaxNode sn : snode.children){
+			if(i%2==0){
+				nodes.add(createPlanPredicateNode(sn));
+			}
+			i++;
+		}
+		switch(snode.syntaxElement.name){
+			case "conjunction":{
+				PlanConjunctionNode node = new PlanConjunctionNode();
+				node.predicates = nodes;
+				return node;
+				
+			}
+			default:{
+				PlanDisjunctionNode node = new PlanDisjunctionNode();
+				node.predicates = nodes;
+				return node;
+			}
+		}
+	}
+	
+	private PlanComparisonNode createPlanComparisonNode(SyntaxNode snode){
+		PlanComparisonNode node = new PlanComparisonNode();
+		switch(snode.children.get(1).syntaxElement.name){
+		case "equals":
+			node.operator = ComparisonOperatorType.equals;
+			break;
+		case "not-equal":
+			node.operator = ComparisonOperatorType.notEqual;
+			break;
+		case "greater-than":
+			node.operator = ComparisonOperatorType.greaterThan;
+			break;
+		case "less-than":
+			node.operator = ComparisonOperatorType.lessThan;
+			break;
+		case "like":
+			node.operator = ComparisonOperatorType.like;
+			break;
+		default:
+			node.operator = ComparisonOperatorType.equals;
+			break;
+		}
+		node.left = createPlanValueNode(snode.children.get(0));
+		node.right = createPlanValueNode(snode.children.get(2));
+		return node;
+	}
+	
+	private PlanValueNode createPlanValueNode(SyntaxNode snode){
+		switch(snode.syntaxElement.name){
+		case "string":
+		{
+			PlanStringLiteralValueNode node = new PlanStringLiteralValueNode();
+			node.value = snode.text.replace("''", "'");
+			return node;
+		}
+		case "number":
+		{
+			PlanNumberLiteralValueNode node = new PlanNumberLiteralValueNode();
+			Token.TokenResult res = (Token.TokenResult)snode.data;
+			node.value = res.number;
+			return node;
+		}
+		case "named-attribute":
+		{
+			PlanAttributeValueNode node = new PlanAttributeValueNode();
+			node.tableName = snode.children.get(0).text;
+			node.attributeName = snode.children.get(1).text;
+			return node;
+		}
+		case "attribute":
+		{
+			PlanAttributeValueNode node = new PlanAttributeValueNode();
+			node.attributeName = snode.text;
+			return node;
+		}
+		default:
+			return null;
+		}
+	}
+	
+	
+
+	private PlanAttributeNode createPlanAttributeNode(SyntaxNode snode){
+		PlanAttributeNode node = new PlanAttributeNode();
+		node.attributeName = snode.text;
+		return node;
+	}
+
 	private PlanNode createPlanNode(SyntaxNode snode){
 
 		return new PlanNode();
