@@ -16,13 +16,15 @@ import org.xml.sax.SAXException;
 
 import qpo.data.info.SystemProperties;
 import qpo.data.model.Attribute;
+import qpo.data.model.AttributeStatistics;
 import qpo.data.model.AttributeTypeEnum;
 import qpo.data.model.FileInfo;
 import qpo.data.model.Index;
+import qpo.data.model.IndexStatistics;
 import qpo.data.model.IndexTypeEnum;
 import qpo.data.model.KeyStatusEnum;
-import qpo.data.model.Statistics;
 import qpo.data.model.Table;
+import qpo.data.model.TableStatistics;
 
 public class CatalogInitializationHelper {
 	
@@ -222,9 +224,9 @@ public class CatalogInitializationHelper {
 	}
 	
 	
-	private static Statistics getTableStatistics(Element eElement) {
+	private static TableStatistics getTableStatistics(Element eElement) {
 		
-		Statistics stats = new Statistics();
+		TableStatistics stats = new TableStatistics();
 		
 		stats.setCardinality( Integer.parseInt(eElement.getElementsByTagName(CARDINALITY_XML_TAG).item(0).getTextContent()) );
 		stats.setTupleSize( Integer.parseInt( eElement.getElementsByTagName(TUPLE_SIZE_XML_TAG).item(0).getTextContent() ) );
@@ -263,9 +265,9 @@ public class CatalogInitializationHelper {
 	}
 	
 	
-	private static Statistics getAttributeStatistics(Element eElement) {
+	private static AttributeStatistics getAttributeStatistics(Element eElement) {
 		
-		Statistics stats = new Statistics();
+		AttributeStatistics stats = new AttributeStatistics();
 		
 		if( validateXMLInput(eElement, MIN_VALUE_XML_TAG) )
 			stats.setMinValue( eElement.getElementsByTagName(MIN_VALUE_XML_TAG).item(0).getTextContent() );
@@ -293,9 +295,9 @@ public class CatalogInitializationHelper {
 	}
 
 	
-	private static Statistics getIndexStatistics(Element eElement) {
+	private static IndexStatistics getIndexStatistics(Element eElement) {
 		
-		Statistics stats = new Statistics();
+		IndexStatistics stats = new IndexStatistics();
 		
 		if( validateXMLInput(eElement, DISTINCT_VALUES_XML_TAG) )
 			stats.setDistinctValues( Integer.parseInt( eElement.getElementsByTagName(DISTINCT_VALUES_XML_TAG).item(0).getTextContent() ) );

@@ -13,7 +13,7 @@ public class Attribute {
 	private String 				referencedTableName;
 	
 	//Statistics
-	private Statistics			statistics;
+	private AttributeStatistics			statistics;
 	
 	
 	public String getName() {
@@ -61,10 +61,10 @@ public class Attribute {
 	
 	
 	
-	public Statistics getStatistics() {
+	public AttributeStatistics getStatistics() {
 		return statistics;
 	}
-	public void setStatistics(Statistics statistics) {
+	public void setStatistics(AttributeStatistics statistics) {
 		this.statistics = statistics;
 	}
 	

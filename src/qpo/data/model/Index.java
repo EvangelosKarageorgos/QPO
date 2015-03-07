@@ -7,7 +7,7 @@ public class Index {
 	private IndexTypeEnum 	type;
 	private String 			attributeName;
 	
-	private Statistics		statistics;
+	private IndexStatistics		statistics;
 	
 	
 	
@@ -33,10 +33,10 @@ public class Index {
 	}
 	
 	
-	public Statistics getStatistics() {
+	public IndexStatistics getStatistics() {
 		return statistics;
 	}
-	public void setStatistics(Statistics statistics) {
+	public void setStatistics(IndexStatistics statistics) {
 		this.statistics = statistics;
 	}
 	

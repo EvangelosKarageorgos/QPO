@@ -8,7 +8,7 @@ public class Table {
 	
 	private String 			name;
 	private FileInfo		fileInfo;
-	private Statistics		statistics;
+	private TableStatistics		statistics;
 	
 	private List<Attribute> attributes;
 	private List<Index>		indexes;
@@ -79,10 +79,10 @@ public class Table {
 	}
 	
 	
-	public Statistics getStatistics() {
+	public TableStatistics getStatistics() {
 		return statistics;
 	}
-	public void setStatistics(Statistics statistics) {
+	public void setStatistics(TableStatistics statistics) {
 		this.statistics = statistics;
 	}
 	
