@@ -6,5 +6,11 @@ public class PlanRelationNode extends PlanTableNode {
 		super();
 		relation = null;
 	}
-	public Table relation;
+	
+	@Override
+	public Table constructTable(){
+		return relation;
+	}
+
+	public Relation relation;
 }

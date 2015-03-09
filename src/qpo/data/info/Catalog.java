@@ -9,13 +9,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 import qpo.data.info.helpers.CatalogInitializationHelper;
+import qpo.data.model.Relation;
 import qpo.data.model.Table;
 
 public class Catalog {
 	
 	private static Catalog 				dbCatalog;
 	
-	private static Map<String, Table> 	catalogMap;
+	private static Map<String, Relation> 	catalogMap;
 	
 	private static SystemProperties 	systemProperties;
 	
@@ -39,7 +40,7 @@ public class Catalog {
 	private void init() {
 		
 		//Init values
-		catalogMap =  new HashMap<String, Table>();
+		catalogMap =  new HashMap<String, Relation>();
 		
 		try {
 			parseXML("src/resources/schema.xml");
@@ -70,13 +71,13 @@ public class Catalog {
 	
 	
 	
-	public static Table getTable(String tableName) {
+	public static Relation getRelation(String tableName) {
 		return getCatalogMap().get(tableName);
 	}
 	
 	
 	
-	public static Map<String, Table> getCatalogMap() {
+	public static Map<String, Relation> getCatalogMap() {
 		
 		if(catalogMap==null) {
 			getInstance();

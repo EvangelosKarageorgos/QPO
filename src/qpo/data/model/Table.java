@@ -6,28 +6,10 @@ import java.util.List;
 public class Table {
 
 	
-	private String 			name;
-	private FileInfo		fileInfo;
 	private TableStatistics		statistics;
 	
 	private List<Attribute> attributes;
 	private List<Index>		indexes;
-	
-	
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public FileInfo getFileInfo() {
-		return fileInfo;
-	}
-	public void setFileInfo(FileInfo fileInfo) {
-		this.fileInfo = fileInfo;
-	}
-	
 	
 	public List<Attribute> getAttributes() {
 		
@@ -42,6 +24,7 @@ public class Table {
 	
 	public void addAttribute(Attribute attribute){
 		getAttributes().add(attribute);
+		attribute.setTable(this);
 	}
 	
 	public Attribute getAttribute(String attributeName){

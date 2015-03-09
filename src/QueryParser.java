@@ -493,9 +493,9 @@ public class QueryParser extends Parser {
 		
 		Map<String, Object> attributes = new HashMap<String, Object>();
 		
-		Map<String, Table> tables = Catalog.getInstance().getCatalogMap();
+		Map<String, Relation> tables = Catalog.getInstance().getCatalogMap();
 		for ( String key : tables.keySet() ) {
-			Table t = tables.get(key);
+			Relation t = tables.get(key);
 		    relation_t.addSymbol(key, t);
 		    for(Attribute a : t.getAttributes()){
 		    	if(!attributes.containsKey(a.getName()))
@@ -517,7 +517,9 @@ public class QueryParser extends Parser {
 	public PlanNode createPlan(String query){
 		SyntaxNode rootNode = this.recognize(query);
 		System.out.println(rootNode);
-		return createPlanTableNode(rootNode);
+		PlanTableNode result = createPlanTableNode(rootNode);
+		result.constructTable();
+		return result;
 	}
 	
 	private PlanTableNode createPlanTableNode(SyntaxNode snode){
@@ -593,7 +595,7 @@ public class QueryParser extends Parser {
 	private PlanRelationNode createPlanRelationNode(SyntaxNode snode){
 		PlanRelationNode node = new PlanRelationNode();
 		Token.TokenResult t = (Token.TokenResult)snode.data;
-		node.relation = (Table)t.data;
+		node.relation = (Relation)t.data;
 		return node;
 	}
 

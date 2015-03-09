@@ -23,6 +23,7 @@ import qpo.data.model.Index;
 import qpo.data.model.IndexStatistics;
 import qpo.data.model.IndexTypeEnum;
 import qpo.data.model.KeyStatusEnum;
+import qpo.data.model.Relation;
 import qpo.data.model.Table;
 import qpo.data.model.TableStatistics;
 
@@ -116,7 +117,7 @@ public class CatalogInitializationHelper {
 	
 	
 	
-	public static void getSchema(Document doc, Map<String, Table> schemaMap) {
+	public static void getSchema(Document doc, Map<String, Relation> schemaMap) {
 		
 		NodeList nList = doc.getElementsByTagName(TABLE_XML_TAG);
 		
@@ -130,7 +131,7 @@ public class CatalogInitializationHelper {
 				
 				Element eElement = (Element) nNode;
 				
-				schemaMap.put( eElement.getAttribute(NAME_XML_ELEMENT), getTable(eElement) );
+				schemaMap.put( eElement.getAttribute(NAME_XML_ELEMENT), getRelation(eElement) );
 			}
 			
 			
@@ -159,8 +160,8 @@ public class CatalogInitializationHelper {
 	
 	
 	
-	public static Table getTable(Element eElement) {
-		Table tbl = new Table();
+	public static Relation getRelation(Element eElement) {
+		Relation tbl = new Relation();
 		
 		tbl.setName( eElement.getAttribute(NAME_XML_ELEMENT) );
 		
@@ -177,7 +178,7 @@ public class CatalogInitializationHelper {
 
 
 
-	private static void addAttributes(Table tbl, Element eElement) {
+	private static void addAttributes(Relation tbl, Element eElement) {
 
 		NodeList nList = eElement.getElementsByTagName(ATTRIBUTE_XML_TAG);
 
@@ -192,7 +193,7 @@ public class CatalogInitializationHelper {
 	}
 	
 	
-	private static void addIndexes(Table tbl, Element eElement) {
+	private static void addIndexes(Relation tbl, Element eElement) {
 
 		NodeList nList = eElement.getElementsByTagName(INDEX_XML_TAG);
 

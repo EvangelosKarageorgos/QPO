@@ -10,6 +10,19 @@ public class PlanProjectNode extends PlanTableNode {
 		table = null;
 		projectedAttributes = null;
 	}
+	
+	@Override
+	public Table constructTable(){
+		Table t = new Table();
+
+		Table mainTable = table.getTable();
+	
+		// TODO project logic construct table
+
+		return t;
+	}
+
+	
 	public PlanTableNode table;
 	public List<PlanAttributeNode> projectedAttributes;
 }

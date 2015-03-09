@@ -73,60 +73,60 @@ public class QPOtester {
 		
 		
 		System.out.println("<<<<<<  Customer FileInfo:   >>>>>>>>>> ");
-		System.out.println("--'"+Catalog.getTable("Customer").getFileInfo().getFilename()+"'--");
-		System.out.println("#"+Catalog.getTable("Customer").getFileInfo().getBlocksNo()+"");
+		System.out.println("--'"+Catalog.getRelation("Customer").getFileInfo().getFilename()+"'--");
+		System.out.println("#"+Catalog.getRelation("Customer").getFileInfo().getBlocksNo()+"");
 		
 		
 		System.out.println("Customer Attributes:");
 		
-		for(Attribute attr : Catalog.getTable("Customer").getAttributes() )
+		for(Attribute attr : Catalog.getRelation("Customer").getAttributes() )
 			System.out.println("#"+attr.getName());
 		
 		
 		System.out.println("Category Attributes:");
 		
-		for(Attribute attr : Catalog.getTable("Category").getAttributes() )
+		for(Attribute attr : Catalog.getRelation("Category").getAttributes() )
 			System.out.println("#"+attr.getName());
 		
 		
 		
 		
 		System.out.println("<<<<<<  Product FileInfo:   >>>>>>>>>> ");
-		System.out.println("--'"+Catalog.getTable("Product").getFileInfo().getFilename()+"'--");
-		System.out.println("#"+Catalog.getTable("Product").getFileInfo().getBlocksNo()+"");
+		System.out.println("--'"+Catalog.getRelation("Product").getFileInfo().getFilename()+"'--");
+		System.out.println("#"+Catalog.getRelation("Product").getFileInfo().getBlocksNo()+"");
 		
 		
 		System.out.println("Product Attributes:");
 		
-		for(Attribute attr : Catalog.getTable("Product").getAttributes() )
+		for(Attribute attr : Catalog.getRelation("Product").getAttributes() )
 			System.out.println("#"+attr.getName());
 		
 		
-		System.out.println("#ProductID - MinValue "+Catalog.getTable("Product").getAttribute("ID").getStatistics().getMinValue()+"");
-		System.out.println("#ProductID - MaxValue "+Catalog.getTable("Product").getAttribute("ID").getStatistics().getMaxValue()+"");
-		System.out.println("#ProductID - Unique Values: "+Catalog.getTable("Product").getAttribute("ID").getStatistics().getUniqueValues()+"");
+		System.out.println("#ProductID - MinValue "+Catalog.getRelation("Product").getAttribute("ID").getStatistics().getMinValue()+"");
+		System.out.println("#ProductID - MaxValue "+Catalog.getRelation("Product").getAttribute("ID").getStatistics().getMaxValue()+"");
+		System.out.println("#ProductID - Unique Values: "+Catalog.getRelation("Product").getAttribute("ID").getStatistics().getUniqueValues()+"");
 		
-		System.out.println("#NationalityCode - MinValue "+Catalog.getTable("Nationality").getAttribute("Code").getStatistics().getMinValue()+"");
-		System.out.println("#NationalityCode - MaxValue "+Catalog.getTable("Nationality").getAttribute("Code").getStatistics().getMaxValue()+"");
-		System.out.println("#NationalityCode - Unique Values: "+Catalog.getTable("Nationality").getAttribute("Code").getStatistics().getUniqueValues()+"");
+		System.out.println("#NationalityCode - MinValue "+Catalog.getRelation("Nationality").getAttribute("Code").getStatistics().getMinValue()+"");
+		System.out.println("#NationalityCode - MaxValue "+Catalog.getRelation("Nationality").getAttribute("Code").getStatistics().getMaxValue()+"");
+		System.out.println("#NationalityCode - Unique Values: "+Catalog.getRelation("Nationality").getAttribute("Code").getStatistics().getUniqueValues()+"");
 		
 		//Indexes
 		System.out.println("Product Indexes:");
 		
-		for(Index idx : Catalog.getTable("Product").getIndexes() )
+		for(Index idx : Catalog.getRelation("Product").getIndexes() )
 			System.out.println("#"+idx.getName());
 		
 		
 		System.out.println("Customer Indexes:");
 		
-		for(Index idx : Catalog.getTable("Customer").getIndexes() )
+		for(Index idx : Catalog.getRelation("Customer").getIndexes() )
 			System.out.println("#"+idx.getName());
 		
 		
-		System.out.println("#CustomerID_index - Type "+Catalog.getTable("Customer").getIndex("ID").getType()+"");
-		System.out.println("#CustomerID_index - Distinct Values "+Catalog.getTable("Customer").getIndex("ID").getStatistics().getDistinctValues()+"");
-		System.out.println("#CustomerSurname_index - Distinct Values "+Catalog.getTable("Customer").getIndex("csurname").getStatistics().getDistinctValues()+"");
-		System.out.println("#CustomerSurname_index - Btree Index "+Catalog.getTable("Customer").getIndex("csurname").getStatistics().getHeightBtree()+"");
+		System.out.println("#CustomerID_index - Type "+Catalog.getRelation("Customer").getIndex("ID").getType()+"");
+		System.out.println("#CustomerID_index - Distinct Values "+Catalog.getRelation("Customer").getIndex("ID").getStatistics().getDistinctValues()+"");
+		System.out.println("#CustomerSurname_index - Distinct Values "+Catalog.getRelation("Customer").getIndex("csurname").getStatistics().getDistinctValues()+"");
+		System.out.println("#CustomerSurname_index - Btree Index "+Catalog.getRelation("Customer").getIndex("csurname").getStatistics().getHeightBtree()+"");
 		
 		
 		

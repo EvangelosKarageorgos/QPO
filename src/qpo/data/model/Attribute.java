@@ -12,6 +12,8 @@ public class Attribute {
 	private String 				referencedAttributeName;
 	private String 				referencedTableName;
 	
+	private Table table = null;
+	
 	//Statistics
 	private AttributeStatistics			statistics;
 	
@@ -21,6 +23,14 @@ public class Attribute {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public Table getTable(){
+		return table;
+	}
+	
+	public void setTable(Table table){
+		this.table = table;
 	}
 	
 	public AttributeTypeEnum getType() {
