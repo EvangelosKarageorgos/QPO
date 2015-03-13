@@ -10,7 +10,7 @@ public class PlanDiffNode extends PlanTableNode {
 	}
 	
 	@Override
-	public Table constructTable(){
+	public Table constructTable() throws Exception{
 		Table table = new Table();
 
 		Table leftTable = left.getTable();

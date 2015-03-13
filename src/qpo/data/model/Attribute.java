@@ -17,6 +17,18 @@ public class Attribute {
 	//Statistics
 	private AttributeStatistics			statistics;
 	
+	public Attribute clone(){
+		Attribute result = new Attribute();
+		result.name = name;
+		result.type = type;
+		result.keyStatus = keyStatus;
+		result.size = size;
+		result.referencedAttributeName = referencedAttributeName;
+		result.referencedTableName = referencedTableName;
+		result.table = table;
+		result.statistics = statistics.clone();
+		return result;
+	}
 	
 	public String getName() {
 		return name;

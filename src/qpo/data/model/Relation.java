@@ -22,5 +22,10 @@ public class Relation extends Table{
 	public void setFileInfo(FileInfo fileInfo) {
 		this.fileInfo = fileInfo;
 	}
-	
+	@Override
+	public void addAttribute(Attribute attribute){
+		super.addAttribute(attribute);
+		attribute.setReferencedTableName(name);
+		attribute.setReferencedAttributeName(attribute.getName());
+	}	
 }

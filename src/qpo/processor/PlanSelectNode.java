@@ -10,12 +10,12 @@ public class PlanSelectNode extends PlanTableNode {
 	}
 	
 	@Override
-	public Table constructTable(){
+	public Table constructTable() throws Exception{
 		Table t = new Table();
 
 		Table mainTable = table.getTable();
 	
-		// TODO select logicconstruct table
+		// TODO select logic construct table
 
 		return t;
 	}

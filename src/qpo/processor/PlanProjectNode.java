@@ -12,10 +12,21 @@ public class PlanProjectNode extends PlanTableNode {
 	}
 	
 	@Override
-	public Table constructTable(){
+	public Table constructTable() throws Exception{
 		Table t = new Table();
 
 		Table mainTable = table.getTable();
+		for(PlanAttributeNode pan : projectedAttributes){
+			Boolean found = false;
+			for(Attribute a : mainTable.getAttributes()){
+				if(a.getName().equalsIgnoreCase(pan.attributeName) && (pan.tableName.length()>0 ? a.getReferencedTableName().equalsIgnoreCase(pan.tableName) : true)){
+					if(found)
+						throw new Exception("Attribute ambiguity");
+					found = true;
+					t.addAttribute(a.clone());
+				}
+			}
+		}
 	
 		// TODO project logic construct table
 

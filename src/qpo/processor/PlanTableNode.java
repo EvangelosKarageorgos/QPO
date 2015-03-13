@@ -7,11 +7,11 @@ public class PlanTableNode extends PlanNode {
 		m_table = null;
 		
 	}
-	public Table constructTable(){
+	public Table constructTable() throws Exception{
 		return new Table();
 	}
 	
-	public Table getTable(){
+	public Table getTable() throws Exception{
 		if(m_table==null)
 			m_table = constructTable();
 		return m_table;

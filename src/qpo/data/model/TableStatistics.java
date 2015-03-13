@@ -5,13 +5,20 @@ public class TableStatistics {
 	private Integer tupleSize;
 	private Integer tuplesPerBlock;
 	
+	public TableStatistics clone(){
+		TableStatistics result = new TableStatistics();
+		result.cardinality = cardinality;
+		result.tupleSize = tupleSize;
+		result.tuplesPerBlock = tuplesPerBlock;
+		return result;
+	}
+
 	public Integer getCardinality() {
 		return cardinality;
 	}
 	public void setCardinality(Integer cardinality) {
 		this.cardinality = cardinality;
 	}
-	
 	
 	public Integer getTupleSize() {
 		return tupleSize;

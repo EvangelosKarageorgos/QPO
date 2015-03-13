@@ -11,6 +11,16 @@ public class Table {
 	private List<Attribute> attributes;
 	private List<Index>		indexes;
 	
+	public Table clone(){
+		Table result = new Table();
+		result.statistics = statistics.clone();
+		result.attributes = new ArrayList<Attribute>();
+		for(Attribute a : attributes){
+			result.addAttribute(a.clone());
+		}
+		return result;
+	}
+	
 	public List<Attribute> getAttributes() {
 		
 		if(attributes==null)
@@ -63,6 +73,8 @@ public class Table {
 	
 	
 	public TableStatistics getStatistics() {
+		if(statistics==null)
+			statistics = new TableStatistics();
 		return statistics;
 	}
 	public void setStatistics(TableStatistics statistics) {

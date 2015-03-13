@@ -1,5 +1,7 @@
 package qpo.data.model;
 
+import java.util.ArrayList;
+
 public class Index {
 
 	
@@ -9,7 +11,14 @@ public class Index {
 	
 	private IndexStatistics		statistics;
 	
-	
+	public Index clone(){
+		Index result = new Index();
+		result.statistics = statistics.clone();
+		result.name = name;
+		result.type = type;
+		result.attributeName = attributeName;
+		return result;
+	}
 	
 	public String getName() {
 		return name;

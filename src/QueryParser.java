@@ -175,6 +175,12 @@ public class QueryParser extends Parser {
 			.setTerminators(terms)
 			.setImportant(true)
 			.setTags(new Object[]{T_ATTRIBUTE});
+		
+		SyntaxElement namedAttribute = new SyntaxElementSyntax("named-attribute")
+			.addElement(relation)
+			.addElement(dot)
+			.addElement(attribute);
+		
 
 		SyntaxElementChoice table = new SyntaxElementChoice("table");
 
@@ -195,12 +201,7 @@ public class QueryParser extends Parser {
 		
 		
 		SyntaxElement predicateElement = new SyntaxElementChoice()
-			.addElement(
-				new SyntaxElementSyntax("named-attribute")
-					.addElement(relation)
-					.addElement(dot)
-					.addElement(attribute)
-			)
+			.addElement(namedAttribute)
 			.addElement(attribute)
 			.addElement(value);
  
@@ -342,8 +343,12 @@ public class QueryParser extends Parser {
 			.setDelimiters(delims)
 			.setImportant(false);
 	
+		SyntaxElement simple_or_named_attribute = new SyntaxElementChoice()
+			.addElement(namedAttribute)
+			.addElement(attribute);
+		
 		SyntaxElement attribute_list = new SyntaxElementSyntax("attribute_list")
-			.addElement(attribute)
+			.addElement(simple_or_named_attribute)
 			.addElement(
 				new SyntaxElementChoice()
 					.addElement(
@@ -351,7 +356,7 @@ public class QueryParser extends Parser {
 							.setElement(
 								new SyntaxElementSyntax()
 									.addElement(comma)
-									.addElement(attribute)
+									.addElement(simple_or_named_attribute)
 									.setImportant(false)
 							)
 					)
@@ -518,7 +523,12 @@ public class QueryParser extends Parser {
 		SyntaxNode rootNode = this.recognize(query);
 		System.out.println(rootNode);
 		PlanTableNode result = createPlanTableNode(rootNode);
-		result.constructTable();
+		try {
+			result.constructTable();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return result;
 	}
 	
@@ -698,9 +708,23 @@ public class QueryParser extends Parser {
 	
 
 	private PlanAttributeNode createPlanAttributeNode(SyntaxNode snode){
-		PlanAttributeNode node = new PlanAttributeNode();
-		node.attributeName = snode.text;
-		return node;
+		switch(snode.syntaxElement.name){
+		case "named-attribute":
+		{
+			PlanAttributeNode node = new PlanAttributeNode();
+			node.tableName = snode.children.get(0).text;
+			node.attributeName = snode.children.get(1).text;
+			return node;
+		}
+		case "attribute":
+		{
+			PlanAttributeNode node = new PlanAttributeNode();
+			node.attributeName = snode.text;
+			return node;
+		}
+		default:
+			return null;
+		}
 	}
 
 	private PlanNode createPlanNode(SyntaxNode snode){

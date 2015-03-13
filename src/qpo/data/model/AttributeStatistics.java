@@ -8,7 +8,20 @@ public class AttributeStatistics {
 	private Object 	minValue;
 	private Object 	maxValue;
 	private Map<String, Integer> histogramValues;
-	
+
+	public AttributeStatistics clone(){
+		AttributeStatistics result = new AttributeStatistics();
+		result.uniqueValues = uniqueValues;
+		result.minValue = minValue;
+		if(histogramValues!=null){
+			result.histogramValues = new HashMap<String, Integer>();
+			for(String k : histogramValues.keySet()){
+				result.histogramValues.put(k, histogramValues.get(k));
+			}
+		}
+		return result;
+	}
+
 	public Integer getUniqueValues() {
 		return uniqueValues;
 	}
