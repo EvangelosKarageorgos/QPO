@@ -13,9 +13,9 @@ public class PlanSelectNode extends PlanTableNode {
 	public Table constructTable() throws Exception{
 		Table t = new Table();
 
-		Table mainTable = table.getTable();
+		Table mainTable = table.getTable().clone();
 	
-		// TODO select logic construct table
+		// TODO evaluate predicate to reduce cardinality
 
 		return t;
 	}

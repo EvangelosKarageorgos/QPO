@@ -19,7 +19,7 @@ public class PlanProjectNode extends PlanTableNode {
 		for(PlanAttributeNode pan : projectedAttributes){
 			Boolean found = false;
 			for(Attribute a : mainTable.getAttributes()){
-				if(a.getName().equalsIgnoreCase(pan.attributeName) && (pan.tableName.length()>0 ? a.getReferencedTableName().equalsIgnoreCase(pan.tableName) : true)){
+				if(a.getName().equalsIgnoreCase(pan.attributeName) && (pan.tableName.length()>0 ? a.getRelationName().equalsIgnoreCase(pan.tableName) : true)){
 					if(found)
 						throw new Exception("Attribute ambiguity");
 					found = true;

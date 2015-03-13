@@ -25,7 +25,6 @@ public class Relation extends Table{
 	@Override
 	public void addAttribute(Attribute attribute){
 		super.addAttribute(attribute);
-		attribute.setReferencedTableName(name);
-		attribute.setReferencedAttributeName(attribute.getName());
+		attribute.setRelationName(name);
 	}	
 }

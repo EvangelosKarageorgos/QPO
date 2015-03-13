@@ -12,10 +12,19 @@ public class Attribute {
 	private String 				referencedAttributeName;
 	private String 				referencedTableName;
 	
+	private String				relationName;
+	
 	private Table table = null;
 	
 	//Statistics
 	private AttributeStatistics			statistics;
+	
+	public Attribute(){
+		name = "";
+		relationName = "";
+		referencedAttributeName = "";
+		referencedTableName = "";
+	}
 	
 	public Attribute clone(){
 		Attribute result = new Attribute();
@@ -33,8 +42,16 @@ public class Attribute {
 	public String getName() {
 		return name;
 	}
+	
+	public String getRelationName() {
+		return relationName;
+	}
+	
 	public void setName(String name) {
 		this.name = name;
+	}
+	public void setRelationName(String name) {
+		this.relationName = name;
 	}
 	
 	public Table getTable(){
