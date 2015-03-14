@@ -2,17 +2,8 @@ package qpo.data.info;
 
 import java.util.List;
 
-import qpo.data.model.Attribute;
-import qpo.data.model.AttributeTypeEnum;
-import qpo.data.model.Table;
-import qpo.processor.PlanAttributeValueNode;
-import qpo.processor.PlanComparisonNode;
-import qpo.processor.PlanConjunctionNode;
-import qpo.processor.PlanDisjunctionNode;
-import qpo.processor.PlanLiteralValueNode;
-import qpo.processor.PlanNegationNode;
-import qpo.processor.PlanPredicateNode;
-import qpo.processor.PlanValueNode;
+import qpo.data.model.*;
+import qpo.processor.*;
 
 
 public class SizeEstimator {
