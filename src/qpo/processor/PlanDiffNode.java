@@ -33,12 +33,28 @@ public class PlanDiffNode extends PlanTableNode {
 		
 		table.getStatistics().setTupleSize(leftTable.getStatistics().getTupleSize());
 		table.getStatistics().setTuplesPerBlock(leftTable.getStatistics().getTuplesPerBlock());
-		table.getStatistics().setCardinality(leftTable.getStatistics().getCardinality() - rightTable.getStatistics().getCardinality());
+		table.getStatistics().setCardinality(leftTable.getStatistics().getCardinality() - rightTable.getStatistics().getCardinality() / 2);
 
 		// TODO diff logic merge tables
 		
 		return table;
 	}
+	
+	protected String toString(int padding){
+		String ps = new String(new char[padding*2]).replace('\0', ' ');
+		
+		String output = "";
+		try{
+			output = ps+"Diff "+getTable().toString(padding)+" {";	
+		}catch(Exception ex){}
+
+		output = output + "\n"+left.toString(padding+1);
+		output = output + "\n"+right.toString(padding+1);
+		output = output + "\n"+ps+"}";
+		
+		return output;
+	}
+	
 	
 	public PlanTableNode left, right;
 

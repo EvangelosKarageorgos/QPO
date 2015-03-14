@@ -39,6 +39,21 @@ public class PlanUnionNode extends PlanTableNode {
 		return table;
 	}
 
+	protected String toString(int padding){
+		String ps = new String(new char[padding*2]).replace('\0', ' ');
+		
+		String output = "";
+		try{
+			output = ps+"Union "+getTable().toString(padding)+" {";	
+		}catch(Exception ex){}
+
+		output = output + "\n"+left.toString(padding+1);
+		output = output + "\n"+right.toString(padding+1);
+		output = output + "\n"+ps+"}";
+		
+		return output;
+	}
+	
 	public PlanTableNode left, right;
 
 }

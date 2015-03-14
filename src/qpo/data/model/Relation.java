@@ -27,4 +27,16 @@ public class Relation extends Table{
 		super.addAttribute(attribute);
 		attribute.setRelationName(name);
 	}	
+	
+	public String toString(int padding){
+		String ps = new String(new char[padding*2]).replace('\0', ' ');
+		String output = name+" (";
+		boolean first = true;
+		for(Attribute a : getAttributes()){
+			output = output + (first?"":", ")+a.toString(false);
+			first = false;
+		}
+		output = output + ")";
+		return output;
+	}
 }

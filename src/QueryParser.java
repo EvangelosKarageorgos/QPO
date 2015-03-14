@@ -92,7 +92,6 @@ public class QueryParser extends Parser {
 				new SyntaxElementChoice()
 					.addElement(
 						new SyntaxElementAny("string")
-							.setTags(new Object[] {T_LITERAL, T_STRING})
 							.setTerminators("'")
 							.setImportant(true)
 					)
@@ -108,7 +107,6 @@ public class QueryParser extends Parser {
 			.setToken(
 				new Token().setNumberTypes(NumberTypes.ANY)
 			)
-			.setTags(new Object[] {T_LITERAL, T_NUMBER})
 			.setDelimiters(delims)
 			.setTerminators(terms);
 		
@@ -166,15 +164,13 @@ public class QueryParser extends Parser {
 			.setToken(relation_t)
 			.setDelimiters(delims)
 			.setTerminators(terms)
-			.setImportant(true)
-			.setTags(new Object[]{T_RELATION});
+			.setImportant(true);
 	
 		SyntaxElement attribute = new SyntaxElementToken("attribute")
 			.setToken(attribute_t)
 			.setDelimiters(delims)
 			.setTerminators(terms)
-			.setImportant(true)
-			.setTags(new Object[]{T_ATTRIBUTE});
+			.setImportant(true);
 		
 		SyntaxElement namedAttribute = new SyntaxElementSyntax("named-attribute")
 			.addElement(relation)
@@ -380,8 +376,7 @@ public class QueryParser extends Parser {
 					.addElement(table)
 					.addElement(pclose)
 					.setImportant(false)
-			)
-			.setTags(new Object[]{T_SELECT});
+			);
 
 		SyntaxElement projection = new SyntaxElementSyntax("project")
 			.addElement(word_proj)
@@ -398,8 +393,7 @@ public class QueryParser extends Parser {
 					.addElement(table)
 					.addElement(pclose)
 					.setImportant(false)
-			)
-			.setTags(new Object[]{T_PROJECT});
+			);
 		
 		SyntaxElement join = new SyntaxElementSyntax("join")
 			.addElement(word_join)
@@ -423,8 +417,7 @@ public class QueryParser extends Parser {
 					.addElement(table)
 					.addElement(pclose)
 					.setImportant(false)
-			)
-			.setTags(new Object[]{T_JOIN});
+			);
 
 		
 		SyntaxElement intersection = new SyntaxElementSyntax("intersection")
@@ -442,8 +435,7 @@ public class QueryParser extends Parser {
 					.addElement(table)
 					.addElement(pclose)
 					.setImportant(false)
-			)
-			.setTags(new Object[]{T_INTERSECT});
+			);
 		
 		SyntaxElement union = new SyntaxElementSyntax("union")
 			.addElement(word_union)
@@ -460,8 +452,7 @@ public class QueryParser extends Parser {
 					.addElement(table)
 					.addElement(pclose)
 					.setImportant(false)
-			)
-			.setTags(new Object[]{T_UNION});
+			);
 
 		SyntaxElement difference = new SyntaxElementSyntax("diff")
 			.addElement(word_diff)
@@ -478,8 +469,7 @@ public class QueryParser extends Parser {
 					.addElement(table)
 					.addElement(pclose)
 					.setImportant(false)
-			)
-			.setTags(new Object[]{T_DIFF});
+			);
 
 		
 		table
@@ -489,8 +479,7 @@ public class QueryParser extends Parser {
 			.addElement(intersection)
 			.addElement(union)
 			.addElement(difference)
-			.addElement(relation)
-			.setTags(new Object[]{T_TABLE});
+			.addElement(relation);
 		
 		
 		this.addSyntaxElement(table);
@@ -519,19 +508,18 @@ public class QueryParser extends Parser {
 		return result;
 	}
 	
-	public PlanNode createPlan(String query){
+	public PlanNode createPlan(String query) throws Exception{
 		SyntaxNode rootNode = this.recognize(query);
-		System.out.println(rootNode);
+		return createPlan(rootNode);
+	}
+
+	public PlanNode createPlan(SyntaxNode rootNode) throws Exception{
+		if(!rootNode.isRecognized)
+			throw new Exception("Query syntax error");
 		PlanTableNode result = createPlanTableNode(rootNode);
-		try {
-			result.constructTable();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		result.constructTable();
 		return result;
 	}
-	
 	private PlanTableNode createPlanTableNode(SyntaxNode snode){
 		switch(snode.syntaxElement.name){
 		case "table":
@@ -615,7 +603,7 @@ public class QueryParser extends Parser {
 			return createPlanComparisonNode(snode);
 		if(snode.syntaxElement.name.equals("negative")){
 			PlanNegationNode node = new PlanNegationNode();
-			node.predicate = createPlanPredicateNode(snode.children.get(0));
+			node.predicate = createPlanPredicateNode(snode.children.get(1));
 			return node;
 		}
 			

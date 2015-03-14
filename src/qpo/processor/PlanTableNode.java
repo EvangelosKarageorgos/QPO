@@ -17,5 +17,19 @@ public class PlanTableNode extends PlanNode {
 		return m_table;
 	}
 	
+	protected String toString(int padding){
+		String ps = new String(new char[padding*2]).replace('\0', ' ');
+
+		String output = "";
+
+		try{
+			output= ps+getTable().toString(padding);
+		}
+		catch(Exception ex){}
+		
+		return output;
+	}
+	
+	
 	private Table m_table;
 }

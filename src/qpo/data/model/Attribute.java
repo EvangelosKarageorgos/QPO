@@ -34,6 +34,7 @@ public class Attribute {
 		result.size = size;
 		result.referencedAttributeName = referencedAttributeName;
 		result.referencedTableName = referencedTableName;
+		result.relationName = relationName;
 		result.table = table;
 		result.statistics = statistics.clone();
 		return result;
@@ -106,8 +107,36 @@ public class Attribute {
 	public void setStatistics(AttributeStatistics statistics) {
 		this.statistics = statistics;
 	}
+	public String toString(){
+		return toString(true);
+	}
 	
-
+	public String toString(boolean hasRelationName){
+		String output = ((relationName.length()>0&&hasRelationName)?relationName+".":"")+name+ ": ";
+		switch(type){
+		case Integer:
+			output = output + "Integer";
+			break;
+		case BigInt:
+			output = output + "BigInt";
+			break;
+		case Character:
+			output = output + "Character("+size+")";
+			break;
+		case Date:
+			output = output + "Date";
+			break;
+		case Timestamp:
+			output = output + "Timestamp";
+			break;
+		case Boolean:
+			output = output + "Boolean";
+			break;
+		default:
+			break;
+		}
+		return output;
+	}
 	
 	
 	

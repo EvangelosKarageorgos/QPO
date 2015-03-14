@@ -5,6 +5,11 @@ public class PlanStringLiteralValueNode extends PlanLiteralValueNode {
 		super();
 		value = null;
 	}
-
+	
+	protected String toString(int padding){
+		String ps = new String(new char[padding*2]).replace('\0', ' ');
+		return "'"+value+"'";
+	}
+	
 	public String value;
 }

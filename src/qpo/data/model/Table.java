@@ -81,6 +81,21 @@ public class Table {
 		this.statistics = statistics;
 	}
 	
+	public String toString(){
+		return toString(0);
+	}
+
+	public String toString(int padding){
+		String ps = new String(new char[padding*2]).replace('\0', ' ');
+		String output = "(";
+		boolean first = true;
+		for(Attribute a : getAttributes()){
+			output = output + (first?"":", ")+a.toString(true);
+			first = false;
+		}
+		output = output + ")";
+		return output;
+	}
 
 	
 }
