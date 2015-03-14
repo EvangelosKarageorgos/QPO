@@ -72,18 +72,28 @@ public class SizeEstimator {
 			return fixedPredicateResult(compPredicate.left, compPredicate.right, table.getStatistics().getCardinality());
 		
 		Integer avgCaseCardinality = table.getStatistics().getCardinality()/2; 
+		Integer cardinality = table.getStatistics().getCardinality();
 		
 		//TODO - extra analysis by value ranges of attributes
-		if(compPredicate.left instanceof PlanAttributeValueNode && compPredicate.right instanceof PlanAttributeValueNode)
-			return avgCaseCardinality;
+		PlanAttributeValueNode leftAttr = (compPredicate.left instanceof PlanAttributeValueNode)?(PlanAttributeValueNode)(compPredicate.left):null;
+		PlanAttributeValueNode rightAttr = (compPredicate.right instanceof PlanAttributeValueNode)?(PlanAttributeValueNode)(compPredicate.right):null;
+		
+		//Join case
+		if(leftAttr!=null && leftAttr.attribute.getTable()!=table)
+			return cardinality;
+		if(rightAttr!=null && rightAttr.attribute.getTable()!=table)
+			return cardinality;
+		
+		if(leftAttr!=null && rightAttr!=null)
+			return cardinality; 
 			
 		
-		Attribute attr = getExpressionAttribute(compPredicate);
+		Attribute attr = getExpressionAttribute(leftAttr, rightAttr);
 		Object val = getExpressionValue(compPredicate);
 		
 		if(attr==null || val==null){
 			System.out.println(" <------  Not existing attribute  --------> ");
-			return avgCaseCardinality;
+			return cardinality;
 		}
 		
 		
@@ -120,15 +130,8 @@ public class SizeEstimator {
 		return null;
 	}
 
-	private static Attribute getExpressionAttribute(PlanComparisonNode compPredicate) {
-		
-		if(compPredicate.left instanceof PlanAttributeValueNode)
-			return ((PlanAttributeValueNode) compPredicate.left).attribute;
-		
-		else if(compPredicate.right instanceof PlanAttributeValueNode)
-			return ((PlanAttributeValueNode) compPredicate.right).attribute;
-		
-		return null;
+	private static Attribute getExpressionAttribute(PlanAttributeValueNode leftAttr, PlanAttributeValueNode rightAttr) {
+		return leftAttr!=null ? leftAttr.attribute : (rightAttr!=null ? rightAttr.attribute : null);
 	}
 	
 	private static Integer fixedPredicateResult(PlanValueNode left, PlanValueNode right, Integer cardinality) {
@@ -142,11 +145,15 @@ public class SizeEstimator {
 	
 	
 	
-	
 
 	public static Integer getJoinEstimatedRecords(Table left, Table right, PlanPredicateNode predicate){
-		//TODO
-		return 1;
+		
+		Integer old_N_right = right.getStatistics().getCardinality();
+		
+		Integer N_left 	= getEstimatedRecords(left, predicate);
+		Integer N_right = getEstimatedRecords(right, predicate);
+		
+		return (N_left * N_right) / old_N_right;
 	}
 	
 	
