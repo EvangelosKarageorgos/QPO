@@ -58,6 +58,7 @@ public class PlanJoinNode extends PlanTableNode {
 			constructPredicate(((PlanNegationNode)pred).predicate);
 		} else if(pred instanceof PlanComparisonNode){
 			constructComparisonNode((PlanComparisonNode)pred);
+			((PlanComparisonNode)pred).checkTypeConsistancy();
 		}
 		
 	}

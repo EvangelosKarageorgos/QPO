@@ -1,5 +1,7 @@
 package qpo.processor;
 
+import qpo.data.model.AttributeTypeEnum;
+
 public class PlanComparisonNode extends PlanPredicateNode{
 	public PlanComparisonNode(){
 		super();
@@ -31,6 +33,17 @@ public class PlanComparisonNode extends PlanPredicateNode{
 			break;
 		}
 		return left.toString()+op+right.toString();
+	}
+	
+	public void checkTypeConsistancy() throws Exception{
+		AttributeTypeEnum leftType = left.getType();
+		AttributeTypeEnum rightType = right.getType();
+		boolean leftStrict = left instanceof PlanAttributeValueNode;
+		boolean rightStrict = right instanceof PlanAttributeValueNode;
+		if(leftStrict && rightStrict && leftType!=rightType)
+			throw new Exception("Type Mismatch");
+		if(AttributeTypeEnum.getTypeClass(leftType)!=AttributeTypeEnum.getTypeClass(rightType))
+			throw new Exception("Type Mismatch");
 	}
 	
 	public PlanValueNode left;

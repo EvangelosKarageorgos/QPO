@@ -37,6 +37,7 @@ public class PlanSelectNode extends PlanTableNode {
 		} else if(pred instanceof PlanComparisonNode){
 			constructValueNode(((PlanComparisonNode)pred).left);
 			constructValueNode(((PlanComparisonNode)pred).right);
+			((PlanComparisonNode)pred).checkTypeConsistancy();
 		}
 		
 	}

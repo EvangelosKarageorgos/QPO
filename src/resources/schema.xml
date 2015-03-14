@@ -195,7 +195,7 @@
 
 		<attributes>
 			<attribute name="ID">
-				<type>BigInteger</type>
+				<type>BigInt</type>
 				<key-status>Primary</key-status>
 				<size>8</size>
 				
@@ -231,7 +231,7 @@
 			</attribute>
 			
 			<attribute name="category_fk">
-				<type>BigInteger</type>
+				<type>BigInt</type>
 				<key-status>Foreign</key-status>
 				<size>8</size>
 				
@@ -303,7 +303,7 @@
 
 		<attributes>
 			<attribute name="ID">
-				<type>BigInteger</type>
+				<type>BigInt</type>
 				<key-status>Primary</key-status>
 				<size>8</size>
 				
@@ -365,7 +365,7 @@
 		<attributes>
 		
 			<attribute name="ID">
-				<type>BigInteger</type>
+				<type>BigInt</type>
 				<key-status>Primary</key-status>
 				<size>8</size>
 				
