@@ -40,15 +40,79 @@ public class PlanJoinNode extends PlanTableNode {
 		
 		table.getStatistics().setTuplesPerBlock(blockSize / table.getStatistics().getTupleSize());
 		
-		constructPredicates();
+		constructPredicate(predicate);
 		
 		table.getStatistics().setCardinality(SizeEstimator.getJoinEstimatedRecords(leftTable, rightTable, predicate));
 	
 		return table;
 	}
 	
-	private void constructPredicates(){
+	private void constructPredicate(PlanPredicateNode pred) throws Exception{
+		if(pred instanceof PlanConjunctionNode){
+			for(PlanPredicateNode p : ((PlanConjunctionNode)pred).predicates)
+				constructPredicate(p);
+		} else if(pred instanceof PlanDisjunctionNode){
+			for(PlanPredicateNode p : ((PlanDisjunctionNode)pred).predicates)
+				constructPredicate(p);
+		} else if(pred instanceof PlanNegationNode){
+			constructPredicate(((PlanNegationNode)pred).predicate);
+		} else if(pred instanceof PlanComparisonNode){
+			constructComparisonNode((PlanComparisonNode)pred);
+		}
 		
+	}
+	
+	private void constructComparisonNode(PlanComparisonNode comp) throws Exception{
+		if((comp.left instanceof PlanAttributeValueNode) && (comp.right instanceof PlanAttributeValueNode)){
+			PlanAttributeValueNode leftAtt = (PlanAttributeValueNode)comp.left;
+			PlanAttributeValueNode rightAtt = (PlanAttributeValueNode)comp.right;
+			if(leftAtt.tableName.length()>0 ^ rightAtt.tableName.length()>0){
+				
+				if(leftAtt.tableName.length()>0){
+					boolean foundLeft = leftAtt.bindToTable(left);
+					boolean foundRight = leftAtt.bindToTable(right);
+					if(foundLeft&&foundRight)
+						throw new Exception("Attribute ambiguity");
+					if(foundLeft){
+						if(!rightAtt.bindToTable(right))
+							throw new Exception("Attribute not found");
+					} else {
+						if(!rightAtt.bindToTable(left))
+							throw new Exception("Attribute not found");
+					}
+				} else {
+					boolean foundLeft = rightAtt.bindToTable(left);
+					boolean foundRight = rightAtt.bindToTable(right);
+					if(foundLeft&&foundRight)
+						throw new Exception("Attribute ambiguity");
+					if(foundLeft){
+						if(!leftAtt.bindToTable(right))
+							throw new Exception("Attribute not found");
+					} else {
+						if(!leftAtt.bindToTable(left))
+							throw new Exception("Attribute not found");
+					}
+				}
+			} else {
+				constructValueNode(comp.left);
+				constructValueNode(comp.right);				
+			}
+		} else{
+			constructValueNode(comp.left);
+			constructValueNode(comp.right);
+		}
+			
+	}
+	private void constructValueNode(PlanValueNode value) throws Exception{
+		if(value instanceof PlanAttributeValueNode){
+			PlanAttributeValueNode pan = (PlanAttributeValueNode)value;
+			boolean foundLeft = pan.bindToTable(left);
+			boolean foundRight = pan.bindToTable(right);
+			if(foundLeft&&foundRight)
+				throw new Exception("Attribute ambiguity");
+			if(!(foundLeft || foundRight))
+				throw new Exception("Attribute not found");
+		}
 	}
 	
 	protected String toString(int padding){

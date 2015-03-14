@@ -1,6 +1,7 @@
 package qpo.processor;
 
 import qpo.data.info.SizeEstimator;
+import qpo.data.model.Attribute;
 import qpo.data.model.Table;
 
 public class PlanSelectNode extends PlanTableNode {
@@ -18,14 +19,33 @@ public class PlanSelectNode extends PlanTableNode {
 		t = mainTable;
 	
 		// TODO evaluate predicate to reduce cardinality
-		constructPredicates();
+		constructPredicate(predicate);
 		t.getStatistics().setCardinality(SizeEstimator.getEstimatedRecords(t, predicate));
 
 		return t;
 	}
 	
-	private void constructPredicates(){
+	private void constructPredicate(PlanPredicateNode pred) throws Exception{
+		if(pred instanceof PlanConjunctionNode){
+			for(PlanPredicateNode p : ((PlanConjunctionNode)pred).predicates)
+				constructPredicate(p);
+		} else if(pred instanceof PlanDisjunctionNode){
+			for(PlanPredicateNode p : ((PlanDisjunctionNode)pred).predicates)
+				constructPredicate(p);
+		} else if(pred instanceof PlanNegationNode){
+			constructPredicate(((PlanNegationNode)pred).predicate);
+		} else if(pred instanceof PlanComparisonNode){
+			constructValueNode(((PlanComparisonNode)pred).left);
+			constructValueNode(((PlanComparisonNode)pred).right);
+		}
 		
+	}
+	private void constructValueNode(PlanValueNode value) throws Exception{
+		if(value instanceof PlanAttributeValueNode){
+			PlanAttributeValueNode pan = (PlanAttributeValueNode)value;
+			if(!pan.bindToTable(table))
+				throw new Exception("Attribute not found");
+		}
 	}
 	
 

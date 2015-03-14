@@ -14,7 +14,18 @@ public class PlanAttributeValueNode extends PlanValueNode {
 		String ps = new String(new char[padding*2]).replace('\0', ' ');
 		return ps+(tableName.length()==0?"":tableName+".")+attributeName;
 	}
-	
+	public boolean bindToTable(PlanTableNode table) throws Exception{
+		boolean found = false;
+		for(Attribute a : table.getTable().getAttributes()){
+			if((tableName.length()==0 || a.getRelationName().equalsIgnoreCase(tableName)) && attributeName.equalsIgnoreCase(a.getName())){
+				if(found)
+					throw new Exception("Attribute ambiguity");
+				found = true;
+				attribute = a;
+			}
+		}
+		return found;
+	}
 	public String attributeName;
 	public String tableName;
 	public Attribute attribute;
