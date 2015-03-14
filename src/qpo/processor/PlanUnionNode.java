@@ -9,6 +9,18 @@ public class PlanUnionNode extends PlanTableNode {
 		right = null;
 	}
 	
+	public PlanUnionNode clone(){
+		PlanUnionNode result = new PlanUnionNode();
+		cloneValuesTo(result);
+		return result;
+	}
+
+	protected void cloneValuesTo(PlanUnionNode node){
+		super.cloneValuesTo(node);
+		node.left = left==null?null:left.clone();
+		node.right = right==null?null:right.clone();
+	}
+	
 	@Override
 	public Table constructTable() throws Exception{
 		Table table = new Table();

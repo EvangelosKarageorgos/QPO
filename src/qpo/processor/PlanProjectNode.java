@@ -1,5 +1,6 @@
 package qpo.processor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import qpo.data.info.Catalog;
@@ -12,7 +13,24 @@ public class PlanProjectNode extends PlanTableNode {
 		table = null;
 		projectedAttributes = null;
 	}
-	
+
+	public PlanProjectNode clone(){
+		PlanProjectNode result = new PlanProjectNode();
+		cloneValuesTo(result);
+		return result;
+	}
+
+	protected void cloneValuesTo(PlanProjectNode node){
+		super.cloneValuesTo(node);
+		node.table = table==null?null:table.clone();
+		node.projectedAttributes = null;
+		if(projectedAttributes!=null){
+			node.projectedAttributes = new ArrayList<PlanAttributeNode>();
+			for(PlanAttributeNode a : projectedAttributes)
+				node.projectedAttributes.add(a.clone());
+		}
+	}
+
 	@Override
 	public Table constructTable() throws Exception{
 		Table t = new Table();

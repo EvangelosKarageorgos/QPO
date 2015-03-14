@@ -1,5 +1,7 @@
 package qpo.processor;
 
+import java.util.ArrayList;
+
 import qpo.data.model.AttributeTypeEnum;
 
 public class PlanComparisonNode extends PlanPredicateNode{
@@ -8,6 +10,19 @@ public class PlanComparisonNode extends PlanPredicateNode{
 		left = null;
 		right = null;
 		operator = ComparisonOperatorType.equals;
+	}
+	
+	public PlanComparisonNode clone(){
+		PlanComparisonNode result = new PlanComparisonNode();
+		cloneValuesTo(result);
+		return result;
+	}
+
+	protected void cloneValuesTo(PlanComparisonNode node){
+		super.cloneValuesTo(node);
+		node.left = left==null?null:left.clone();
+		node.right = right==null?null:right.clone();
+		node.operator = operator;
 	}
 	
 	protected String toString(int padding){

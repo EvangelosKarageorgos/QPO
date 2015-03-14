@@ -8,6 +8,17 @@ public class PlanStringLiteralValueNode extends PlanLiteralValueNode {
 		value = null;
 	}
 	
+	public PlanStringLiteralValueNode clone(){
+		PlanStringLiteralValueNode result = new PlanStringLiteralValueNode();
+		cloneValuesTo(result);
+		return result;
+	}
+
+	protected void cloneValuesTo(PlanStringLiteralValueNode node){
+		super.cloneValuesTo(node);
+		node.value = value;
+	}
+
 	protected String toString(int padding){
 		String ps = new String(new char[padding*2]).replace('\0', ' ');
 		return "'"+value+"'";

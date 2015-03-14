@@ -11,5 +11,13 @@ public class PlanNode {
 		String ps = new String(new char[padding*2]).replace('\0', ' ');
 		return ps;
 	}
+	public PlanNode clone(){
+		PlanNode result = new PlanNode();
+		cloneValuesTo(result);
+		return result;
+	}
+	protected void cloneValuesTo(PlanNode node){
+		
+	}
 
 }

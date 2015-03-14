@@ -13,6 +13,20 @@ public class PlanJoinNode extends PlanTableNode {
 		right = null;
 		predicate = null;
 	}
+	
+	public PlanJoinNode clone(){
+		PlanJoinNode result = new PlanJoinNode();
+		cloneValuesTo(result);
+		return result;
+	}
+
+	protected void cloneValuesTo(PlanJoinNode node){
+		super.cloneValuesTo(node);
+		node.left = left==null?null:left.clone();
+		node.right = right==null?null:right.clone();
+		node.predicate = predicate==null?null:predicate.clone();
+	}
+
 	public PlanTableNode left, right;
 	public PlanPredicateNode predicate; 
 

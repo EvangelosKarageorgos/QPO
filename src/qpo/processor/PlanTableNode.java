@@ -5,8 +5,19 @@ import qpo.data.model.*;
 public class PlanTableNode extends PlanNode {
 	public PlanTableNode(){
 		m_table = null;
-		
 	}
+	
+	public PlanTableNode clone(){
+		PlanTableNode result = new PlanTableNode();
+		cloneValuesTo(result);
+		return result;
+	}
+
+	protected void cloneValuesTo(PlanTableNode node){
+		super.cloneValuesTo(node);
+		node.m_table = m_table==null?null:m_table.clone();
+	}
+
 	public Table constructTable() throws Exception{
 		return new Table();
 	}

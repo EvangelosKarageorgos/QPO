@@ -13,11 +13,13 @@ public class QPO {
 		//System.out.println(parser.recognize("proj[ID, pname, cat_name](join[Product.category_fk=Category.ID](Product)(Category))"));
 		
 		String query = "proj[Category.ID, pname,cat_name](join[Product.category_fk=Category.ID or Product.ID=ID](sel [ID<5 and (pcode like 'c0%' or not 1=2)](Product))(Category))";
+		query = "sel [ID<5 and (pcode like 'c0%' or not 1=2)](Product)";
 		System.out.println(query);
 		SyntaxNode planSyntax = parser.recognize(query);
 		System.out.println(planSyntax);
 		PlanNode plan = parser.createPlan(planSyntax);
 		System.out.println(plan);
+		System.out.println(plan.clone());
 	}
 
 }

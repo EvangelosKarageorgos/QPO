@@ -11,6 +11,18 @@ public class PlanSelectNode extends PlanTableNode {
 		predicate = null;
 	}
 	
+	public PlanSelectNode clone(){
+		PlanSelectNode result = new PlanSelectNode();
+		cloneValuesTo(result);
+		return result;
+	}
+
+	protected void cloneValuesTo(PlanSelectNode node){
+		super.cloneValuesTo(node);
+		node.table = table==null?null:table.clone();
+		node.predicate = predicate==null?null:predicate.clone();
+	}
+	
 	@Override
 	public Table constructTable() throws Exception{
 		Table t = new Table();
@@ -20,7 +32,7 @@ public class PlanSelectNode extends PlanTableNode {
 	
 		// TODO evaluate predicate to reduce cardinality
 		constructPredicate(predicate);
-		t.getStatistics().setCardinality(SizeEstimator.getEstimatedRecords(t, predicate));
+		t.getStatistics().setCardinality(SizeEstimator.getEstimatedRecords(table.getTable(), predicate));
 
 		return t;
 	}

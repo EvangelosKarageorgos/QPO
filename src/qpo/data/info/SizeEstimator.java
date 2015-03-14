@@ -30,14 +30,14 @@ public class SizeEstimator {
 	
 	private static Integer getConjuctionRecords(Table table, PlanConjunctionNode conPredicate){
 		
-		Integer cardinalityNr = table.getStatistics().getCardinality();
-		Integer conjustionEstimation = 1;
+		Double cardinalityNr = (double)table.getStatistics().getCardinality();
+		Double conjustionEstimation = 1.0;
 		
 		for(PlanPredicateNode predNode: conPredicate.predicates){
-			conjustionEstimation = conjustionEstimation * ( getEstimatedRecords(table, predNode) /cardinalityNr);
+			conjustionEstimation = conjustionEstimation * ( (double)getEstimatedRecords(table, predNode) /cardinalityNr);
 		}
 		
-		return cardinalityNr * conjustionEstimation;
+		return (int)(cardinalityNr * conjustionEstimation);
 	}
 	
 	private static Integer getDisjuctionRecords(Table table, PlanDisjunctionNode disPredicate){
@@ -76,7 +76,7 @@ public class SizeEstimator {
 			return cardinality;
 		
 		if(leftAttr!=null && rightAttr!=null)
-			return cardinality; 
+			return getAttributeOnAttributeSizeEstimation(cardinality, leftAttr.attribute, rightAttr.attribute, compPredicate.operator); 
 			
 		
 		Attribute attr = getExpressionAttribute(leftAttr, rightAttr);
@@ -108,7 +108,121 @@ public class SizeEstimator {
 		return avgCaseCardinality;
 	}
 
+	public static Integer getJoinEstimatedRecords(Table left, Table right, PlanPredicateNode predicate){
+		
+		if(predicate instanceof PlanComparisonNode)
+			return getJoinSelectionRecords(left, right, (PlanComparisonNode)predicate);
+			
+		else if(predicate instanceof PlanNegationNode)
+			return getJoinNegationRecords(left, right, (PlanNegationNode)predicate);
+		
+		else if(predicate instanceof PlanConjunctionNode)
+			return getJoinConjuctionRecords(left, right, (PlanConjunctionNode)predicate);
+			
+		else if(predicate instanceof PlanDisjunctionNode)
+			getJoinDisjuctionRecords(left, right, (PlanDisjunctionNode)predicate);
+		
+		
+		return left.getStatistics().getCardinality()*right.getStatistics().getCardinality()/2;
+	}
+	
+	
+	private static Integer getJoinConjuctionRecords(Table left, Table right, PlanConjunctionNode conPredicate){
+		
+		Integer cardinalityNr = left.getStatistics().getCardinality()*right.getStatistics().getCardinality();
+		Integer conjustionEstimation = 1;
+		
+		for(PlanPredicateNode predNode: conPredicate.predicates){
+			conjustionEstimation = conjustionEstimation * ( getJoinEstimatedRecords(left, right, predNode) /cardinalityNr);
+		}
+		
+		return cardinalityNr * conjustionEstimation;
+	}
+	
+	private static Integer getJoinDisjuctionRecords(Table left, Table right, PlanDisjunctionNode disPredicate){
+		
+		Integer cardinalityNr = left.getStatistics().getCardinality()*right.getStatistics().getCardinality();
+		Integer disjustionEstimation = 1;
+	
+		for(PlanPredicateNode predNode: disPredicate.predicates){
+			disjustionEstimation = disjustionEstimation * ( 1-(getJoinEstimatedRecords(left, right, predNode) /cardinalityNr));
+		}
+		
+		return cardinalityNr * (1-disjustionEstimation);
+	}
+	
+	private static Integer getJoinNegationRecords(Table left, Table right, PlanNegationNode negPredicate){
+		return left.getStatistics().getCardinality()*right.getStatistics().getCardinality() - getJoinEstimatedRecords(left, right, negPredicate.predicate);
+	}
+	
 
+	private static Integer getJoinSelectionRecords(Table left, Table right, PlanComparisonNode compPredicate){
+		
+		if(compPredicate.left instanceof PlanLiteralValueNode && compPredicate.right instanceof PlanLiteralValueNode)
+			return fixedPredicateResult(compPredicate.left, compPredicate.right, left.getStatistics().getCardinality()*right.getStatistics().getCardinality());
+		
+		Integer avgCaseCardinality = left.getStatistics().getCardinality()*right.getStatistics().getCardinality()/2; 
+		Integer cardinality = left.getStatistics().getCardinality()*right.getStatistics().getCardinality();
+		
+		//TODO - extra analysis by value ranges of attributes
+		PlanAttributeValueNode leftAttr = (compPredicate.left instanceof PlanAttributeValueNode)?(PlanAttributeValueNode)(compPredicate.left):null;
+		PlanAttributeValueNode rightAttr = (compPredicate.right instanceof PlanAttributeValueNode)?(PlanAttributeValueNode)(compPredicate.right):null;
+		
+		//Join case
+		
+		if(leftAttr!=null && rightAttr!=null){
+			if(leftAttr.attribute.getTable()==rightAttr.attribute.getTable()){
+				return getAttributeOnAttributeSizeEstimation(cardinality, leftAttr.attribute, rightAttr.attribute, compPredicate.operator); 
+			} else{
+				if(leftAttr.attribute.getKeyStatus()==KeyStatusEnum.Foreign
+					&& leftAttr.attribute.getReferencedAttributeName().equalsIgnoreCase(rightAttr.attribute.getName())
+					&& leftAttr.attribute.getReferencedTableName().equalsIgnoreCase(rightAttr.attribute.getRelationName())){
+						return left.getStatistics().getCardinality();
+				}
+				if(rightAttr.attribute.getKeyStatus()==KeyStatusEnum.Foreign
+					&& rightAttr.attribute.getReferencedAttributeName().equalsIgnoreCase(leftAttr.attribute.getName())
+					&& rightAttr.attribute.getReferencedTableName().equalsIgnoreCase(leftAttr.attribute.getRelationName())){
+						return right.getStatistics().getCardinality();
+					
+				}
+				return getAttributeOnAttributeSizeEstimation(cardinality, leftAttr.attribute, rightAttr.attribute, compPredicate.operator);
+			}
+		}
+		
+			
+		
+		Attribute attr = getExpressionAttribute(leftAttr, rightAttr);
+		Object val = getExpressionValue(compPredicate);
+		
+		if(attr==null || val==null){
+			System.out.println(" <------  Not existing attribute  --------> ");
+			return cardinality;
+		}
+		
+		
+		switch(compPredicate.operator){
+			case equals:
+				return getEstimatedRecords(attr, val);
+			case notEqual:
+				return cardinality - getEstimatedRecords(attr, val);
+			case greaterThan:
+				return getEstimatedRecordsRangeOverValue(attr, val);
+			case lessThan:
+				return getEstimatedRecordsRangeOverValue(attr, val);
+			case like:
+				return cardinality / 10;
+			default:
+				break;
+		}
+		
+		
+		//Average case. Should not reach here anyway
+		return avgCaseCardinality;
+	}
+
+	private static Integer getAttributeOnAttributeSizeEstimation(Integer fullCardinality, Attribute attribute1, Attribute attribute2, ComparisonOperatorType operator){
+		return fullCardinality / 10;
+	}
 	
 	private static Object getExpressionValue(PlanComparisonNode compPredicate) {
 		
@@ -131,23 +245,14 @@ public class SizeEstimator {
 	
 	
 	
-	
-	
-	
-	
-	
-
-	public static Integer getJoinEstimatedRecords(Table left, Table right, PlanPredicateNode predicate){
-		
-		
-		
+	/*public static Integer getJoinEstimatedRecords(Table left, Table right, PlanPredicateNode predicate){
 		Integer old_N_right = right.getStatistics().getCardinality();
 		
 		Integer N_left 	= getEstimatedRecords(left, predicate);
 		Integer N_right = getEstimatedRecords(right, predicate);
 		
 		return (N_left * N_right) / old_N_right;
-	}
+	}*/
 	
 	
 	
@@ -165,9 +270,9 @@ public class SizeEstimator {
 		if(attribute.getType().equals(AttributeTypeEnum.Integer) || attribute.getType().equals(AttributeTypeEnum.BigInt)
 				|| value instanceof Number ) {
 			
-			Integer maxValue 	= Integer.parseInt( attribute.getStatistics().getMaxValue().toString() );
-			Integer minValue 	= Integer.parseInt( attribute.getStatistics().getMinValue().toString() );
-			Integer vvalue 		= Integer.parseInt( value.toString() );
+			Double maxValue 	= Double.parseDouble( attribute.getStatistics().getMaxValue().toString() );
+			Double minValue 	= Double.parseDouble( attribute.getStatistics().getMinValue().toString() );
+			Double vvalue 		= Double.parseDouble( value.toString() );
 			
 			estimRes = (int) (Nr * (maxValue - vvalue)	/ (maxValue - minValue ));
 		}
@@ -186,9 +291,9 @@ public class SizeEstimator {
 		if(attribute.getType().equals(AttributeTypeEnum.Integer) || attribute.getType().equals(AttributeTypeEnum.BigInt) 
 				|| value instanceof Number ) {
 			
-			Integer maxValue 	= Integer.parseInt( attribute.getStatistics().getMaxValue().toString() );
-			Integer minValue 	= Integer.parseInt( attribute.getStatistics().getMinValue().toString() );
-			Integer vvalue 		= Integer.parseInt( value.toString() );
+			Double maxValue 	= Double.parseDouble( attribute.getStatistics().getMaxValue().toString() );
+			Double minValue 	= Double.parseDouble( attribute.getStatistics().getMinValue().toString() );
+			Double vvalue 		= Double.parseDouble( value.toString() );
 			
 			estimRes = (int) (Nr * (vvalue - minValue)	/ (maxValue - minValue ));
 		}

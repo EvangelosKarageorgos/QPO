@@ -1,11 +1,28 @@
 package qpo.processor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlanDisjunctionNode extends PlanPredicateNode {
 	public PlanDisjunctionNode(){
 		super();
 		predicates = null;
+	}
+	
+	public PlanDisjunctionNode clone(){
+		PlanDisjunctionNode result = new PlanDisjunctionNode();
+		cloneValuesTo(result);
+		return result;
+	}
+
+	protected void cloneValuesTo(PlanDisjunctionNode node){
+		super.cloneValuesTo(node);
+		node.predicates = null;
+		if(predicates!=null){
+			node.predicates = new ArrayList<PlanPredicateNode>();
+			for(PlanPredicateNode p : predicates)
+				node.predicates.add(p.clone());
+		}
 	}
 	
 	protected String toString(int padding){

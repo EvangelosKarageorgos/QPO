@@ -10,6 +10,19 @@ public class PlanAttributeValueNode extends PlanValueNode {
 		attribute = null;
 	}
 	
+	public PlanAttributeValueNode clone(){
+		PlanAttributeValueNode result = new PlanAttributeValueNode();
+		cloneValuesTo(result);
+		return result;
+	}
+
+	protected void cloneValuesTo(PlanAttributeValueNode node){
+		super.cloneValuesTo(node);
+		node.attributeName = attributeName;
+		node.tableName = tableName;
+		node.attribute = attribute==null?null:attribute.clone();
+	}
+
 	protected String toString(int padding){
 		String ps = new String(new char[padding*2]).replace('\0', ' ');
 		return ps+(tableName.length()==0?"":tableName+".")+attributeName;
