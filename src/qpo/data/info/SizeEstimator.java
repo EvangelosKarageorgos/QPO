@@ -139,6 +139,8 @@ public class SizeEstimator {
 
 	public static Integer getJoinEstimatedRecords(Table left, Table right, PlanPredicateNode predicate){
 		
+		
+		
 		Integer old_N_right = right.getStatistics().getCardinality();
 		
 		Integer N_left 	= getEstimatedRecords(left, predicate);
