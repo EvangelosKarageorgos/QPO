@@ -26,6 +26,9 @@ public class PlanAttributeValueNode extends PlanValueNode {
 		}
 		return found;
 	}
+	public AttributeTypeEnum getType(){
+		return attribute==null?AttributeTypeEnum.Integer:attribute.getType();
+	}
 	public String attributeName;
 	public String tableName;
 	public Attribute attribute;

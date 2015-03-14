@@ -1,5 +1,7 @@
 package qpo.processor;
 
+import qpo.data.model.AttributeTypeEnum;
+
 public class PlanStringLiteralValueNode extends PlanLiteralValueNode {
 	public PlanStringLiteralValueNode(){
 		super();
@@ -11,5 +13,12 @@ public class PlanStringLiteralValueNode extends PlanLiteralValueNode {
 		return "'"+value+"'";
 	}
 	
+	public AttributeTypeEnum getType(){
+		return AttributeTypeEnum.Character;
+	}
+	
+	public Object getValue(){
+		return value;
+	}
 	public String value;
 }
