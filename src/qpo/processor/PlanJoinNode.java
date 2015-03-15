@@ -3,15 +3,20 @@ package qpo.processor;
 import java.util.List;
 
 import qpo.data.info.Catalog;
+import qpo.data.info.CostEstimator;
 import qpo.data.info.SizeEstimator;
 import qpo.data.model.*;
 
 public class PlanJoinNode extends PlanTableNode {
+	
+	public JoinTypeEnum joinType;
+	
 	public PlanJoinNode(){
 		super();
 		left = null;
 		right = null;
 		predicate = null;
+		joinType = JoinTypeEnum.BlockLoopNested;
 	}
 	
 	public PlanJoinNode clone(){
@@ -60,6 +65,8 @@ public class PlanJoinNode extends PlanTableNode {
 		
 		table.getStatistics().setCardinality(SizeEstimator.getJoinEstimatedRecords(leftTable, rightTable, predicate));
 	
+		setJoinInfo( CostEstimator.getCheapestJoin(this) );
+		
 		return table;
 	}
 	
@@ -165,5 +172,14 @@ public class PlanJoinNode extends PlanTableNode {
 		else if(index==1)
 			right = node;
 	}
+
+	
+	public void setJoinInfo(JoinInfo joinInfo) {
+		joinType = joinInfo.getJoinType();
+		setM_cost(joinInfo.getCostIO());
+	}
+	
+	
+	
 
 }

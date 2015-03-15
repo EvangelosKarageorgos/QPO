@@ -89,7 +89,46 @@ public class PlanTableNode extends PlanNode {
 			invalidate();
 		}
 	}
+	
+	
 	private boolean isValid;
 	private PlanTableNode m_parent;
 	private Table m_table;
+	private int m_cost=0;
+	
+	
+	public boolean isValid() {
+		return isValid;
+	}
+
+	public void setValid(boolean isValid) {
+		this.isValid = isValid;
+	}
+
+	public PlanTableNode getM_parent() {
+		return m_parent;
+	}
+
+	public void setM_parent(PlanTableNode m_parent) {
+		this.m_parent = m_parent;
+	}
+
+	public Table getM_table() {
+		return m_table;
+	}
+
+	public void setM_table(Table m_table) {
+		this.m_table = m_table;
+	}
+
+	public int getM_cost() {
+		return m_cost;
+	}
+
+	public void setM_cost(int m_cost) {
+		this.m_cost = m_cost;
+	}
+	
+	
+	
 }
