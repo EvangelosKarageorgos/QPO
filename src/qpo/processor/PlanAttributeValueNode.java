@@ -1,5 +1,7 @@
 package qpo.processor;
 
+import java.util.List;
+
 import qpo.data.model.*;
 
 public class PlanAttributeValueNode extends PlanValueNode {
@@ -42,6 +44,19 @@ public class PlanAttributeValueNode extends PlanValueNode {
 	public AttributeTypeEnum getType(){
 		return attribute==null?AttributeTypeEnum.Integer:attribute.getType();
 	}
+	
+	protected void fillUniqueAttributes(List<Attribute> attributeList){
+		boolean found = false;
+		for(Attribute a : attributeList){
+			if(a.getName().equalsIgnoreCase(attribute.getName()) && a.getName().equalsIgnoreCase(attribute.getName())){
+				found = true;
+				break;
+			}
+		}
+		if(!found)
+			attributeList.add(attribute);
+	}
+
 	public String attributeName;
 	public String tableName;
 	public Attribute attribute;

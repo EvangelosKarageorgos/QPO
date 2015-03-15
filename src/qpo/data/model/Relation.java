@@ -12,6 +12,7 @@ public class Relation extends Table{
 	public String getName() {
 		return name;
 	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -19,9 +20,11 @@ public class Relation extends Table{
 	public FileInfo getFileInfo() {
 		return fileInfo;
 	}
+	
 	public void setFileInfo(FileInfo fileInfo) {
 		this.fileInfo = fileInfo;
 	}
+	
 	@Override
 	public void addAttribute(Attribute attribute){
 		super.addAttribute(attribute);
@@ -36,7 +39,7 @@ public class Relation extends Table{
 			output = output + (first?"":", ")+a.toString(false);
 			first = false;
 		}
-		output = output + ")";
+		output = output + ") "+getStatistics().getCardinality()+" records";
 		return output;
 	}
 }

@@ -93,7 +93,7 @@ public class Table {
 			output = output + (first?"":", ")+a.toString(true);
 			first = false;
 		}
-		output = output + ")";
+		output = output + ") "+getStatistics().getCardinality()+" records";
 		return output;
 	}
 

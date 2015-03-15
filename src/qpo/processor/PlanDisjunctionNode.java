@@ -3,6 +3,8 @@ package qpo.processor;
 import java.util.ArrayList;
 import java.util.List;
 
+import qpo.data.model.Attribute;
+
 public class PlanDisjunctionNode extends PlanPredicateNode {
 	public PlanDisjunctionNode(){
 		super();
@@ -37,5 +39,11 @@ public class PlanDisjunctionNode extends PlanPredicateNode {
 		return "("+output+")";
 	}
 	
+	protected void fillUniqueAttributes(List<Attribute> attributeList){
+		if(predicates!=null)
+			for(PlanPredicateNode p : predicates)
+				p.fillUniqueAttributes(attributeList);
+	}
+
 	public List<PlanPredicateNode> predicates;
 }

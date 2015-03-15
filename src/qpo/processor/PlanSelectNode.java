@@ -1,5 +1,7 @@
 package qpo.processor;
 
+import java.util.List;
+
 import qpo.data.info.SizeEstimator;
 import qpo.data.model.Attribute;
 import qpo.data.model.Table;
@@ -20,6 +22,7 @@ public class PlanSelectNode extends PlanTableNode {
 	protected void cloneValuesTo(PlanSelectNode node){
 		super.cloneValuesTo(node);
 		node.table = table==null?null:table.clone();
+		if(node.table!=null)node.table.setParent(node);
 		node.predicate = predicate==null?null:predicate.clone();
 	}
 	
@@ -73,6 +76,32 @@ public class PlanSelectNode extends PlanTableNode {
 		output = output + "\n"+ps+"}";
 		
 		return output;
+	}
+	
+	public int getNumOfChildren(){
+		return 1;
+	}
+	public PlanTableNode getChild(int index){
+		if(index==0)
+			return table;
+		else return null;
+	}
+	
+	public void setChild(int index, PlanTableNode node){
+		if(index==0)
+			table = node;
+	}
+
+	
+	public boolean moveDownwards(){
+		List<Attribute> attrList = predicate.getUniqueAttributes();
+		if(table.getNumOfChildren()==1){
+			moveDownwardsOperation(0, 0);
+			return true;
+		}
+		if(table.getNumOfChildren()!=1)
+			return false;
+		return false;
 	}
 	
 	public PlanTableNode table;

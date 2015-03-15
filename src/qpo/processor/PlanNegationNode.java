@@ -1,5 +1,9 @@
 package qpo.processor;
 
+import java.util.List;
+
+import qpo.data.model.Attribute;
+
 public class PlanNegationNode extends PlanPredicateNode {
 	public PlanNegationNode(){
 		super();
@@ -22,5 +26,9 @@ public class PlanNegationNode extends PlanPredicateNode {
 		return "not "+predicate.toString();
 	}
 	
+	protected void fillUniqueAttributes(List<Attribute> attributeList){
+		if(predicate!=null)predicate.fillUniqueAttributes(attributeList);
+	}
+
 	public PlanPredicateNode predicate;
 }

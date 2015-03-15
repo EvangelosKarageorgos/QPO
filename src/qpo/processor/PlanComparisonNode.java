@@ -1,7 +1,9 @@
 package qpo.processor;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import qpo.data.model.Attribute;
 import qpo.data.model.AttributeTypeEnum;
 
 public class PlanComparisonNode extends PlanPredicateNode{
@@ -59,6 +61,11 @@ public class PlanComparisonNode extends PlanPredicateNode{
 			throw new Exception("Type Mismatch");
 		if(AttributeTypeEnum.getTypeClass(leftType)!=AttributeTypeEnum.getTypeClass(rightType))
 			throw new Exception("Type Mismatch");
+	}
+	
+	protected void fillUniqueAttributes(List<Attribute> attributeList){
+		if(left!=null && (left instanceof PlanAttributeValueNode))((PlanAttributeValueNode)left).fillUniqueAttributes(attributeList);
+		if(right!=null && (right instanceof PlanAttributeValueNode))((PlanAttributeValueNode)right).fillUniqueAttributes(attributeList);
 	}
 	
 	public PlanValueNode left;

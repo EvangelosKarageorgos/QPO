@@ -548,6 +548,7 @@ public class QueryParser extends Parser {
 		PlanSelectNode node = new PlanSelectNode();
 		node.predicate = createPlanPredicateNode(snode.children.get(0));
 		node.table = createPlanTableNode(snode.children.get(1));
+		node.table.setParent(node);
 		return node;
 	}
 
@@ -558,6 +559,7 @@ public class QueryParser extends Parser {
 			node.projectedAttributes.add(createPlanAttributeNode(n));
 		}
 		node.table = createPlanTableNode(snode.children.get(1));
+		node.table.setParent(node);
 		return node;
 	}
 
@@ -566,6 +568,8 @@ public class QueryParser extends Parser {
 		node.predicate = createPlanPredicateNode(snode.children.get(0));
 		node.left = createPlanTableNode(snode.children.get(1));
 		node.right = createPlanTableNode(snode.children.get(2));
+		node.left.setParent(node);
+		node.right.setParent(node);
 		return node;
 	}
 
@@ -573,6 +577,8 @@ public class QueryParser extends Parser {
 		PlanUnionNode node = new PlanUnionNode();
 		node.left = createPlanTableNode(snode.children.get(0));
 		node.right = createPlanTableNode(snode.children.get(1));
+		node.left.setParent(node);
+		node.right.setParent(node);
 		return node;
 	}
 
@@ -580,6 +586,8 @@ public class QueryParser extends Parser {
 		PlanDiffNode node = new PlanDiffNode();
 		node.left = createPlanTableNode(snode.children.get(0));
 		node.right = createPlanTableNode(snode.children.get(1));
+		node.left.setParent(node);
+		node.right.setParent(node);
 		return node;
 	}
 
@@ -587,6 +595,8 @@ public class QueryParser extends Parser {
 		PlanIntersectNode node = new PlanIntersectNode();
 		node.left = createPlanTableNode(snode.children.get(0));
 		node.right = createPlanTableNode(snode.children.get(1));
+		node.left.setParent(node);
+		node.right.setParent(node);
 		return node;
 	}
 

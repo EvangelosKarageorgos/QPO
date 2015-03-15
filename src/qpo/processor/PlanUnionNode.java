@@ -19,6 +19,8 @@ public class PlanUnionNode extends PlanTableNode {
 		super.cloneValuesTo(node);
 		node.left = left==null?null:left.clone();
 		node.right = right==null?null:right.clone();
+		if(node.left!=null)node.left.setParent(node);
+		if(node.right!=null)node.right.setParent(node);
 	}
 	
 	@Override
@@ -66,6 +68,24 @@ public class PlanUnionNode extends PlanTableNode {
 		return output;
 	}
 	
+	public int getNumOfChildren(){
+		return 2;
+	}
+	public PlanTableNode getChild(int index){
+		if(index==0)
+			return left;
+		else if(index==1)
+			return right;
+		else return null;
+	}
+	
+	public void setChild(int index, PlanTableNode node){
+		if(index==0)
+			left = node;
+		else if(index==1)
+			right = node;
+	}
+
 	public PlanTableNode left, right;
 
 }

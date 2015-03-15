@@ -31,5 +31,9 @@ public class PlanRelationNode extends PlanTableNode {
 		return output;
 	}
 	
+	public int getNumOfChildren(){
+		return 0;
+	}
+	
 	public Relation relation;
 }

@@ -23,6 +23,7 @@ public class PlanProjectNode extends PlanTableNode {
 	protected void cloneValuesTo(PlanProjectNode node){
 		super.cloneValuesTo(node);
 		node.table = table==null?null:table.clone();
+		if(node.table!=null)node.table.setParent(node);
 		node.projectedAttributes = null;
 		if(projectedAttributes!=null){
 			node.projectedAttributes = new ArrayList<PlanAttributeNode>();
@@ -72,6 +73,51 @@ public class PlanProjectNode extends PlanTableNode {
 		return output;
 	}
 	
+	public int getNumOfChildren(){
+		return 1;
+	}
+	public PlanTableNode getChild(int index){
+		if(index==0)
+			return table;
+		else return null;
+	}
+	
+	public void setChild(int index, PlanTableNode node){
+		if(index==0)
+			table = node;
+	}
+	public boolean moveDownwards(){
+		if(table.getNumOfChildren()==1){
+			boolean canMove = true;
+			if(table instanceof PlanSelectNode){
+				if(table.getChild(0) instanceof PlanRelationNode)
+					return false;
+				List<Attribute> attrList = ((PlanSelectNode)table).predicate.getUniqueAttributes();
+				for(Attribute a : attrList){
+					boolean found = false;
+					for(PlanAttributeNode pan : projectedAttributes){
+						if((pan.tableName.length()==0||pan.tableName.equalsIgnoreCase(a.getRelationName())) && pan.attributeName.equalsIgnoreCase(a.getName())){
+							found = true;
+							break;
+						}
+					}
+					if(!found){
+						canMove = false;
+						break;
+					}
+				}
+			}
+			if(canMove){
+				moveDownwardsOperation(0, 0);
+				return true;
+			} else
+				return false;
+		}
+		if(table.getNumOfChildren()!=1)
+			return false;
+		return false;
+	}
+
 	public PlanTableNode table;
 	public List<PlanAttributeNode> projectedAttributes;
 }
