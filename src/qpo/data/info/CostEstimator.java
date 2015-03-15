@@ -1,5 +1,7 @@
 package qpo.data.info;
 
+import qpo.data.model.JoinInfo;
+
 
 public class CostEstimator {
 
@@ -118,6 +120,14 @@ public class CostEstimator {
 	
 	
 	
+	
+	
+	
+	
+	// Join Cost Estimator
+	public static JoinInfo getCheapestJoin(){
+		return null;
+	}
 	
 	
 	
