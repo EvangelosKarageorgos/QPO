@@ -152,6 +152,8 @@ public class PlanSelectNode extends PlanTableNode {
 	
 	private Integer getMyCost() throws Exception {
 		
+		if (!(getChild(0) instanceof PlanRelationNode)) return 0;
+		
 		if( SizeEstimator.getEstimatedRecords(getChild(0).getTable(), predicate) > 0.35*(getChild(0).getTable().getStatistics().getCardinality())  )
 			return CostEstimator.getCostOfLinear( getChild(0).getTable().getStatistics().getBlocksOnDisk() );
 		
