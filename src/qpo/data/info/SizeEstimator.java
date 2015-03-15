@@ -76,7 +76,7 @@ public class SizeEstimator {
 		PlanAttributeValueNode rightAttr = (compPredicate.right instanceof PlanAttributeValueNode)?(PlanAttributeValueNode)(compPredicate.right):null;
 		
 		//Join case
-		if(leftAttr!=null && leftAttr.attribute.getTable()!=table)
+		if(leftAttr!=null && !leftAttr.attribute.getTable().getUid().equals(table.getUid()))
 			return cardinality;
 		if(rightAttr!=null && rightAttr.attribute.getTable()!=table)
 			return cardinality;
@@ -279,7 +279,7 @@ public class SizeEstimator {
 	
 	
 	public static Integer getEstimatedRecords(Attribute attribute, Object value) {
-		return attribute.getTable().getStatistics().getCardinality() /	attribute.getStatistics().getUniqueValues();
+		return Math.max(attribute.getTable().getStatistics().getCardinality() /	attribute.getStatistics().getUniqueValues(), 1);
 	}
 	
 	

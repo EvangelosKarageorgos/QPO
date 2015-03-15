@@ -11,6 +11,13 @@ public class Table {
 	private List<Attribute> attributes;
 	private List<Index>		indexes;
 	
+	
+	private String uid=null;
+	public String getUid(){
+		if(uid==null)
+			uid=java.util.UUID.randomUUID().toString();
+		return uid;
+	}
 	public Table clone(){
 		Table result = new Table();
 		result.statistics = statistics.clone();

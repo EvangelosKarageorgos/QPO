@@ -86,32 +86,207 @@ public class PlanProjectNode extends PlanTableNode {
 		if(index==0)
 			table = node;
 	}
-	public boolean moveDownwards(){
+	public boolean moveDownwards() throws Exception{
 		if(table.getNumOfChildren()==1){
 			boolean canMove = true;
 			if(table instanceof PlanSelectNode){
 				if(table.getChild(0) instanceof PlanRelationNode)
 					return false;
 				List<Attribute> attrList = ((PlanSelectNode)table).predicate.getUniqueAttributes();
+				List<PlanAttributeNode> newAttrList = new ArrayList<PlanAttributeNode>();
 				for(Attribute a : attrList){
 					boolean found = false;
 					for(PlanAttributeNode pan : projectedAttributes){
-						if((pan.tableName.length()==0||pan.tableName.equalsIgnoreCase(a.getRelationName())) && pan.attributeName.equalsIgnoreCase(a.getName())){
+						if((pan.tableName.length()==0||a.getRelationName().length()==0||pan.tableName.equalsIgnoreCase(a.getRelationName())) && pan.attributeName.equalsIgnoreCase(a.getName())){
 							found = true;
 							break;
 						}
 					}
 					if(!found){
+						PlanAttributeNode pan = new PlanAttributeNode();
+						pan.tableName = a.getRelationName();
+						pan.attributeName = a.getName();
+						newAttrList.add(pan);
 						canMove = false;
-						break;
+						//break;
 					}
 				}
+				if(!canMove){
+					PlanProjectNode newProject = new PlanProjectNode();
+					newProject.table = table;
+					newProject.projectedAttributes = new ArrayList<PlanAttributeNode>();
+					for(PlanAttributeNode a : projectedAttributes)
+						newProject.projectedAttributes.add(a);
+					for(PlanAttributeNode a : newAttrList)
+						newProject.projectedAttributes.add(a);
+					table.setParent(newProject);
+					newProject.table = table;
+					table = newProject;
+					newProject.setParent(this);
+					newProject.moveDownwardsOperation(0, 0);
+					//newProject.invalidate();
+					newProject.moveDownwards();
+					return false;
+				}
+			} else if(table instanceof PlanProjectNode){
+				List<PlanAttributeNode> attrList = ((PlanProjectNode)table).projectedAttributes;
+				List<PlanAttributeNode> finalAttrList = new ArrayList<PlanAttributeNode>();
+				//for(PlanAttributeNode a : projectedAttributes)
+				//	finalAttrList.add(a);
+				for(PlanAttributeNode a : attrList){
+					boolean found = false;
+					for(PlanAttributeNode pan : projectedAttributes){
+						if((pan.tableName.length()==0||a.tableName.length()==0||pan.tableName.equalsIgnoreCase(a.tableName)) && pan.attributeName.equalsIgnoreCase(a.attributeName)){
+							found = true;
+							break;
+						}
+					}
+					if(found){
+						finalAttrList.add(a);
+					}
+				}
+				for(PlanAttributeNode a : projectedAttributes){
+					boolean f = false;
+					for(PlanAttributeNode pan : finalAttrList){
+						if((pan.tableName.length()==0||a.tableName.length()==0||pan.tableName.equalsIgnoreCase(a.tableName)) && pan.attributeName.equalsIgnoreCase(a.attributeName)){
+							f = true;
+							break;
+						}
+					}
+					if(!f && isAttributeNecessary(a))
+						finalAttrList.add(a.clone());
+				}
+				for(PlanAttributeNode a : attrList){
+					boolean f = false;
+					for(PlanAttributeNode pan : finalAttrList){
+						if((pan.tableName.length()==0||a.tableName.length()==0||pan.tableName.equalsIgnoreCase(a.tableName)) && pan.attributeName.equalsIgnoreCase(a.attributeName)){
+							f = true;
+							break;
+						}
+					}
+					if(!f && isAttributeNecessary(a))
+						finalAttrList.add(a.clone());
+				}
+
+				projectedAttributes = finalAttrList;
+				table.getChild(0).setParent(this);
+				table = table.getChild(0);
+				invalidate();
+				return moveDownwards();
 			}
 			if(canMove){
 				moveDownwardsOperation(0, 0);
-				return true;
+				return moveDownwards();
 			} else
 				return false;
+		}
+		if(table instanceof PlanJoinNode){
+			List<Attribute> attrList = ((PlanJoinNode)table).predicate.getUniqueAttributes();
+			List<Attribute> leftAttrList = new ArrayList<Attribute>();
+			List<Attribute> rightAttrList = new ArrayList<Attribute>();
+			for(Attribute a : attrList){
+				if(a.getTable().getUid().equals(((PlanJoinNode)table).left.getTable().getUid()))
+					leftAttrList.add(a.clone());
+				if(a.getTable().getUid().equals(((PlanJoinNode)table).right.getTable().getUid()))
+					rightAttrList.add(a.clone());
+			}
+			boolean canMove = false;
+			boolean leftCanMove = true;
+			boolean rightCanMove = true;
+			List<PlanAttributeNode> newleftAttrList = new ArrayList<PlanAttributeNode>();
+			List<PlanAttributeNode> newrightAttrList = new ArrayList<PlanAttributeNode>();
+			for(Attribute a : leftAttrList){
+				boolean found = false;
+				for(PlanAttributeNode pan : projectedAttributes){
+					if((pan.tableName.length()==0||a.getRelationName().length()==0||pan.tableName.equalsIgnoreCase(a.getRelationName())) && pan.attributeName.equalsIgnoreCase(a.getName())){
+						found = true;
+						break;
+					}
+				}
+				if(!found){
+					PlanAttributeNode pan = new PlanAttributeNode();
+					pan.tableName = a.getRelationName();
+					pan.attributeName = a.getName();
+					newleftAttrList.add(pan);
+					leftCanMove = false;
+					canMove = false;
+					//break;
+				}
+			}
+			for(Attribute a : rightAttrList){
+				boolean found = false;
+				for(PlanAttributeNode pan : projectedAttributes){
+					if((pan.tableName.length()==0||a.getRelationName().length()==0||pan.tableName.equalsIgnoreCase(a.getRelationName())) && pan.attributeName.equalsIgnoreCase(a.getName())){
+						found = true;
+						break;
+					}
+				}
+				if(!found){
+					PlanAttributeNode pan = new PlanAttributeNode();
+					pan.tableName = a.getRelationName();
+					pan.attributeName = a.getName();
+					newrightAttrList.add(pan);
+					rightCanMove = false;
+					canMove = false;
+					//break;
+				}
+			}
+	
+			if(!leftCanMove){
+	
+				PlanProjectNode newProject = new PlanProjectNode();
+				newProject.table = table;
+				newProject.projectedAttributes = new ArrayList<PlanAttributeNode>();
+				for(PlanAttributeNode a : projectedAttributes)
+					newProject.projectedAttributes.add(a);
+				for(PlanAttributeNode a : newleftAttrList)
+					newProject.projectedAttributes.add(a);
+				table.setParent(newProject);
+				newProject.table = table;
+				table = newProject;
+				newProject.setParent(this);
+				newProject.moveDownwardsOperation(0, 0);
+				//newProject.invalidate();
+				newProject.moveDownwards();
+			}
+			if(!rightCanMove){
+	
+				PlanProjectNode newProject = new PlanProjectNode();
+				newProject.table = table;
+				newProject.projectedAttributes = new ArrayList<PlanAttributeNode>();
+				for(PlanAttributeNode a : projectedAttributes)
+					newProject.projectedAttributes.add(a);
+				for(PlanAttributeNode a : newrightAttrList)
+					newProject.projectedAttributes.add(a);
+				table.setParent(newProject);
+				newProject.table = table;
+				table = newProject;
+				newProject.setParent(this);
+				newProject.moveDownwardsOperation(0, 1);
+				//newProject.invalidate();
+				newProject.moveDownwards();
+			}
+		}
+		if(table instanceof PlanUnionNode){
+			PlanProjectNode newProject = new PlanProjectNode();
+			newProject.table = table;
+			newProject.projectedAttributes = new ArrayList<PlanAttributeNode>();
+			for(PlanAttributeNode a : projectedAttributes)
+				newProject.projectedAttributes.add(a.clone());
+			table.setParent(newProject);
+			table = newProject;
+			newProject.setParent(this);
+			newProject.moveDownwardsOperation(0, 1);
+			newProject.invalidate();
+			newProject.moveDownwards();
+			moveDownwardsOperation(0, 0);
+			invalidate();
+			return moveDownwards();
+		}
+		if(table instanceof PlanDiffNode){
+			moveDownwardsOperation(0, 0);
+			invalidate();
+			return moveDownwards();
 		}
 		if(table.getNumOfChildren()!=1)
 			return false;

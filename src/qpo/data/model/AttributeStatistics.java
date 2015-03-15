@@ -13,6 +13,7 @@ public class AttributeStatistics {
 		AttributeStatistics result = new AttributeStatistics();
 		result.uniqueValues = uniqueValues;
 		result.minValue = minValue;
+		result.maxValue = maxValue;
 		if(histogramValues!=null){
 			result.histogramValues = new HashMap<String, Integer>();
 			for(String k : histogramValues.keySet()){

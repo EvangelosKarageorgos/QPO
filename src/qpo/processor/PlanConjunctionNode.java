@@ -39,6 +39,17 @@ public class PlanConjunctionNode extends PlanPredicateNode {
 		return "("+output+")";
 	}
 	
+	public PlanPredicateNode mergeWith(PlanPredicateNode predicate){
+		if(predicate==null)
+			return this;
+		if(predicate instanceof PlanConjunctionNode){
+			for(PlanPredicateNode p : ((PlanConjunctionNode)predicate).predicates)
+				predicates.add(p);
+		} else{
+			predicates.add(predicate);
+		}
+		return this;
+	}
 	protected void fillUniqueAttributes(List<Attribute> attributeList){
 		if(predicates!=null)
 			for(PlanPredicateNode p : predicates)

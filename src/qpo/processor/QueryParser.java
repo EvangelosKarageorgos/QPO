@@ -357,7 +357,7 @@ public class QueryParser extends Parser {
 									.setImportant(false)
 							)
 					)
-					.addElement(new SyntaxElementNone())
+					.addElement(new SyntaxElementNone().setTerminators(terms))
 					.setImportant(false)
 			);
 		

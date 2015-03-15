@@ -28,10 +28,10 @@ public class PlanSelectNode extends PlanTableNode {
 	
 	@Override
 	public Table constructTable() throws Exception{
-		Table t = new Table();
+		Table t = table.getTable().clone();
 
-		Table mainTable = table.getTable().clone();
-		t = mainTable;
+		//Table mainTable = table.getTable().clone();
+		//t = mainTable;
 	
 		// TODO evaluate predicate to reduce cardinality
 		constructPredicate(predicate);
@@ -94,11 +94,46 @@ public class PlanSelectNode extends PlanTableNode {
 
 	
 	public boolean moveDownwards(){
-		List<Attribute> attrList = predicate.getUniqueAttributes();
 		if(table.getNumOfChildren()==1){
+			if(table instanceof PlanSelectNode){
+				predicate = predicate.mergeWith(((PlanSelectNode)table).predicate);
+				table.getChild(0).setParent(this);
+				table = table.getChild(0);
+				invalidate();
+				return moveDownwards();
+			}
 			moveDownwardsOperation(0, 0);
-			return true;
+			return moveDownwards();
 		}
+		if(table instanceof PlanUnionNode){
+			PlanSelectNode newSelect = new PlanSelectNode();
+			newSelect.table = table;
+			newSelect.predicate = predicate.clone();
+			table.setParent(newSelect);
+			table = newSelect;
+			newSelect.setParent(this);
+			newSelect.moveDownwardsOperation(0, 1);
+			newSelect.invalidate();
+			newSelect.moveDownwards();
+			moveDownwardsOperation(0, 0);
+			invalidate();
+			return moveDownwards();
+		}
+		if(table instanceof PlanDiffNode){
+			moveDownwardsOperation(0, 0);
+			invalidate();
+			return moveDownwards();
+		}
+		if(table instanceof PlanJoinNode){
+			((PlanJoinNode)table).predicate = ((PlanJoinNode)table).predicate.mergeWith(predicate); 
+			
+			
+			//moveDownwardsOperation(0, 0);
+			//invalidate();
+			return false;
+			//return moveDownwards();
+		}
+
 		if(table.getNumOfChildren()!=1)
 			return false;
 		return false;

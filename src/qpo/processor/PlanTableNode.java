@@ -1,5 +1,7 @@
 package qpo.processor;
 
+import java.util.List;
+
 import qpo.data.model.*;
 
 public class PlanTableNode extends PlanNode {
@@ -27,6 +29,13 @@ public class PlanTableNode extends PlanNode {
 		return m_parent;
 	}
 	
+	public PlanTableNode getRootNode(){
+		PlanTableNode result = this;
+		while(result.getParent()!=null)
+			result = result.getParent();
+		return result;
+	}
+	
 	public void setParent(PlanTableNode node){
 		m_parent = node;
 	}
@@ -36,6 +45,7 @@ public class PlanTableNode extends PlanNode {
 			m_table = constructTable();
 			if(getParent()!=null)
 				getParent().invalidate();
+			isValid = true;
 		}
 		return m_table;
 	}
@@ -79,18 +89,41 @@ public class PlanTableNode extends PlanNode {
 				} else if(parent.getChild(1)==this){
 					parent.setChild(1, child);
 				}
-				parent.invalidate();
+				//parent.invalidate();
 			}
 			child.setParent(parent);
-			child.invalidate();
+			//child.invalidate();
 			setParent(child);
 			setChild(index, child.getChild(childIndex));
 			child.setChild(childIndex, this);
 			invalidate();
 		}
 	}
-	
-	
+	protected boolean isAttributeNecessary(PlanAttributeNode pan){
+		boolean result = false;
+		if(getParent()!=null)
+			result = result || getParent().isAttributeNecessary(pan);
+		if(!result){
+			if(this instanceof PlanSelectNode){
+				List<Attribute> attrs = ((PlanSelectNode)this).predicate.getUniqueAttributes();
+				for(Attribute a : attrs){
+					if((pan.tableName.length()==0||pan.tableName.equalsIgnoreCase(a.getRelationName())) && pan.attributeName.equalsIgnoreCase(a.getName())){
+						return true;
+					}
+				}
+			} else
+			if(this instanceof PlanJoinNode){
+				List<Attribute> attrs = ((PlanJoinNode)this).predicate.getUniqueAttributes();
+				for(Attribute a : attrs){
+					if((pan.tableName.length()==0||pan.tableName.equalsIgnoreCase(a.getRelationName())) && pan.attributeName.equalsIgnoreCase(a.getName())){
+						return true;
+					}
+				}
+			}
+		}
+		return result;
+			
+	}
 	private boolean isValid;
 	private PlanTableNode m_parent;
 	private Table m_table;
