@@ -8,31 +8,38 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import qpo.data.info.Catalog;
-import qpo.data.model.Attribute;
-import qpo.data.model.Index;
+import qpo.data.info.CostEstimator;
+import qpo.data.model.*;
+import qpo.processor.*;
 
 public class QPOtester {
 	
 	
 	@Test
-	public void runQPO() {
+	public void runQPO() throws Exception {
 		
-//		Catalog dbCatalog = Catalog.getInstance();
+//		printDebug();
 		
-		
-
-		printDebug();
-		
-		
-		
-//		try {
-//			parseXML("src/resources/schema.xml");
-//		} 
-//		catch (Exception e) {
-//			e.printStackTrace();
-//		}
-		
+		testJoinCost(new QueryParser());
 	 
+	}
+
+
+
+
+	private void testJoinCost(QueryParser parser) throws Exception {
+//		String query = "proj[Category.ID, pname,cat_name](join[Product.category_fk=Category.ID or Product.ID=ID](sel [ID<5 and (pcode like 'c0%' or not 1=2)](Product))(Category))";
+		String query = "join[Product.category_fk=Category.ID](Product)(Category)";
+		
+		PlanNode plan = parser.createPlan(query);
+		
+		PlanJoinNode joinNode = (PlanJoinNode) plan;
+		
+		JoinInfo joinInfo = CostEstimator.getCheapestJoin(joinNode);
+		
+		System.out.println("Join Type = " + joinInfo.getJoinType() );
+		System.out.println("Join Cost = " + joinInfo.getCostIO() );
+		
 	}
 	
 	

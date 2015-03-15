@@ -1,6 +1,7 @@
 package qpo.data.info;
 
-import qpo.data.model.JoinInfo;
+import qpo.data.model.*;
+import qpo.processor.*;
 
 
 public class CostEstimator {
@@ -125,9 +126,46 @@ public class CostEstimator {
 	
 	
 	// Join Cost Estimator
-	public static JoinInfo getCheapestJoin(){
-		return null;
+	public static JoinInfo getCheapestJoin(PlanJoinNode joinNode) throws Exception {
+		
+		JoinInfo joinInfo = null;
+		Integer minCostIO = null;
+		
+		for(JoinTypeEnum joinType : JoinTypeEnum.values()) {
+			Integer currentCost = getCostPerJoin(joinNode, joinType);
+			if( minCostIO==null || minCostIO>currentCost ) {
+				minCostIO = currentCost;
+				joinInfo = new JoinInfo(joinType, minCostIO);
+			}
+		}
+		
+		return joinInfo;
 	}
+	
+	
+	private static Integer getCostPerJoin(PlanJoinNode joinNode, JoinTypeEnum joinType) throws Exception {
+
+		Integer blocksR = joinNode.left.getTable().getStatistics().getBlocksOnDisk();
+		Integer blocksS = joinNode.right.getTable().getStatistics().getBlocksOnDisk();
+		Integer blocksMem = Catalog.getSystemProperties().getPagesPerBuffer();
+		
+		switch(joinType){
+		case HashJoin:
+			return getJoinCostOfHash(blocksR, blocksS, blocksMem);
+		case MergeSort:
+			return getJoinCostOfExternalSort(blocksR, blocksS, blocksMem);
+		case BlockLoopNested:
+			return getJoinCostOfBlockNested(blocksR, blocksS, blocksMem);
+		case IndexedBtreeJoin:
+			return getJoinCostOfBlockNested(blocksR, blocksS, blocksMem)+100; //TODO Btree estimation
+		case IndexedHashJoin:
+			return getJoinCostOfBlockNested(blocksR, blocksS, blocksMem)+100; //TODO Hash Estimation
+		default:
+			return getJoinCostOfHash(blocksR, blocksS, blocksMem);
+		}
+
+	}
+	
 	
 	
 	

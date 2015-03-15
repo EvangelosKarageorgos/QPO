@@ -34,4 +34,10 @@ public class TableStatistics {
 		this.tuplesPerBlock = tuplesPerBlock;
 	}
 
+	
+	public Integer getBlocksOnDisk(){
+		return (cardinality%tuplesPerBlock!=0) ? (cardinality/tuplesPerBlock)+1 : (cardinality/tuplesPerBlock);
+	}
+	
+	
 }
