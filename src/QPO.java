@@ -13,7 +13,9 @@ public class QPO {
 		//System.out.println(parser.recognize("proj[ID, pname, cat_name](join[Product.category_fk=Category.ID](Product)(Category))"));
 		
 		String query = "proj[Category.ID, pname,cat_name](join[Product.category_fk=Category.ID or Product.ID=ID](sel [ID<5 and (pcode like 'c0%' or not 1=2)](Product))(Category))";
-		query = "sel [ID<5 and (pcode like 'c0%' or not 1=2)](proj[ID, pcode](Product))";
+//		query = "sel [ID<5 and (pcode like 'c0%' or not 1=2)](Product)";
+		query = "sel [not ID<500 AND pname like 'Shampoo'](Product)";
+		
 		System.out.println(query);
 		SyntaxNode planSyntax = parser.recognize(query);
 		System.out.println(planSyntax);
