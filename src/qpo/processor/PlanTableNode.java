@@ -131,6 +131,10 @@ public class PlanTableNode extends PlanNode {
 	
 	
 
+	public Integer getCost() throws Exception{
+		return null;
+	}
+	
 	
 	
 }

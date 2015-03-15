@@ -2,6 +2,7 @@ package qpo.processor;
 
 import java.util.List;
 
+import qpo.data.info.CostEstimator;
 import qpo.data.info.SizeEstimator;
 import qpo.data.model.Attribute;
 import qpo.data.model.Table;
@@ -141,4 +142,23 @@ public class PlanSelectNode extends PlanTableNode {
 	
 	public PlanTableNode table;
 	public PlanPredicateNode predicate; 
+	
+	
+	@Override
+	public Integer getCost() throws Exception{
+		return getChild(0).getCost() + getMyCost();
+	}
+	
+	
+	private Integer getMyCost() throws Exception {
+		
+		if( SizeEstimator.getEstimatedRecords(getChild(0).getTable(), predicate) > 0.35*(getChild(0).getTable().getStatistics().getCardinality())  )
+			return CostEstimator.getCostOfLinear( getChild(0).getTable().getStatistics().getBlocksOnDisk() );
+		
+		
+		return CostEstimator.getSelectionEstimatedCost( getChild(0).getTable(), predicate);
+	}
+
+	
+	
 }

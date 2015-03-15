@@ -1,5 +1,6 @@
 package qpo.processor;
 
+import qpo.data.info.CostEstimator;
 import qpo.data.model.*;
 public class PlanRelationNode extends PlanTableNode {
 	public PlanRelationNode(){
@@ -36,4 +37,12 @@ public class PlanRelationNode extends PlanTableNode {
 	}
 	
 	public Relation relation;
+	
+	
+	@Override
+	public Integer getCost() throws Exception{
+		return 0;
+	}
+	
+	
 }

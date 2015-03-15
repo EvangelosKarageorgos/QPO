@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import qpo.data.info.Catalog;
+import qpo.data.info.CostEstimator;
 import qpo.data.info.SizeEstimator;
 import qpo.data.model.*;
 
@@ -295,4 +296,19 @@ public class PlanProjectNode extends PlanTableNode {
 
 	public PlanTableNode table;
 	public List<PlanAttributeNode> projectedAttributes;
+	
+	
+	
+	@Override
+	public Integer getCost() throws Exception{
+		return getChild(0).getCost() + getMyCost();
+	}
+	
+	
+	private Integer getMyCost() throws Exception {
+		return !(getChild(0) instanceof PlanRelationNode) ? 0 
+					: CostEstimator.getCostOfLinear( getChild(0).getTable().getStatistics().getBlocksOnDisk() ); 
+	}
+	
+	
 }

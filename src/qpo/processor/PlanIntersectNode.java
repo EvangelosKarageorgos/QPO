@@ -1,6 +1,9 @@
 package qpo.processor;
 
+import qpo.data.info.CostEstimator;
 import qpo.data.model.Attribute;
+import qpo.data.model.JoinInfo;
+import qpo.data.model.JoinTypeEnum;
 import qpo.data.model.Table;
 
 public class PlanIntersectNode extends PlanTableNode {
@@ -52,6 +55,9 @@ public class PlanIntersectNode extends PlanTableNode {
 		table.getStatistics().setCardinality(Math.min(leftTable.getStatistics().getCardinality(),rightTable.getStatistics().getCardinality())/2);
 
 		// TODO intersect logic merge tables
+		
+		setJoinInfo( CostEstimator.getCheapestIntersection(this) );
+		
 
 		return table;
 	}
@@ -91,5 +97,28 @@ public class PlanIntersectNode extends PlanTableNode {
 	}
 
 	public PlanTableNode left, right;
+	
+	
+	
+	private JoinTypeEnum joinType;
+	private Integer myCost;
+	
+	public void setJoinInfo(JoinInfo joinInfo) {
+		joinType = joinInfo.getJoinType();
+		myCost = joinInfo.getCostTime();
+	}
+	
+	
+	@Override
+	public Integer getCost() throws Exception{
+		return getChild(0).getCost() + getChild(1).getCost() + getMyCost();
+	}
+	
+	
+	private Integer getMyCost() throws Exception {
+		return myCost; 
+	}
+	
+	
 
 }

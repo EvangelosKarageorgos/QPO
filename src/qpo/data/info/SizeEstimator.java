@@ -245,7 +245,7 @@ public class SizeEstimator {
 		return fullCardinality / 10;
 	}
 	
-	private static Object getExpressionValue(PlanComparisonNode compPredicate) {
+	public static Object getExpressionValue(PlanComparisonNode compPredicate) {
 		
 		if(compPredicate.left instanceof PlanLiteralValueNode)
 			return ((PlanLiteralValueNode) compPredicate.left).getValue();
@@ -256,7 +256,7 @@ public class SizeEstimator {
 		return null;
 	}
 
-	private static Attribute getExpressionAttribute(PlanAttributeValueNode leftAttr, PlanAttributeValueNode rightAttr) {
+	public static Attribute getExpressionAttribute(PlanAttributeValueNode leftAttr, PlanAttributeValueNode rightAttr) {
 		return leftAttr!=null ? leftAttr.attribute : (rightAttr!=null ? rightAttr.attribute : null);
 	}
 	

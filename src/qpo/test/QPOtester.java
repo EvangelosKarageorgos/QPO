@@ -20,7 +20,11 @@ public class QPOtester {
 		
 //		printDebug();
 		
-		testJoinCost(new QueryParser());
+//		testJoinCost(new QueryParser());
+		
+//		testSelectCost(new QueryParser());
+		
+		testComplexCost(new QueryParser());
 	 
 	}
 
@@ -39,6 +43,38 @@ public class QPOtester {
 		
 		System.out.println("Join Type = " + joinInfo.getJoinType() );
 		System.out.println("Join Cost = " + joinInfo.getCostTime() );
+		
+	}
+	
+	
+	private void testSelectCost(QueryParser parser) throws Exception {
+//		String query = "proj[Category.ID, pname,cat_name](join[Product.category_fk=Category.ID or Product.ID=ID](sel [ID<5 and (pcode like 'c0%' or not 1=2)](Product))(Category))";
+//		String query = "join[OrderItem.product_fk=Product.ID](OrderItem)(Product)";
+//		String query = "sel [(ID=5 OR ID=100 OR ID=500) AND ID<20](Product)";
+		String query = "sel [ID>10 AND ID<20](Product)";
+		
+		
+		PlanNode plan = parser.createPlan(query);
+		
+		PlanSelectNode selectNode = (PlanSelectNode) plan;
+		
+		System.out.println("Select Cost = " + selectNode.getCost() );
+		
+	}
+	
+	
+	private void testComplexCost(QueryParser parser) throws Exception {
+//		String query = "proj[Category.ID, pname,cat_name](join[Product.category_fk=Category.ID or Product.ID=ID](sel [ID<5 and (pcode like 'c0%' or not 1=2)](Product))(Category))";
+//		String query = "join[OrderItem.product_fk=Product.ID](OrderItem)(Product)";
+//		String query = "sel [(ID=5 OR ID=100 OR ID=500) AND ID<20](Product)";
+		String query = "proj[Product.ID, Product.pname](sel [(Product.ID>10 AND Product.ID<20) OR Product.ID=100 OR Product.ID=500] (join[Product.category_fk=Category.ID](Product)(Category)) )";
+		
+		
+		PlanNode plan = parser.createPlan(query);
+		
+		PlanTableNode selectNode = (PlanTableNode) plan;
+		
+		System.out.println("Select Cost = " + selectNode.getCost() );
 		
 	}
 	

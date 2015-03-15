@@ -1,5 +1,6 @@
 package qpo.processor;
 
+import qpo.data.info.CostEstimator;
 import qpo.data.model.*;
 
 public class PlanUnionNode extends PlanTableNode {
@@ -87,5 +88,24 @@ public class PlanUnionNode extends PlanTableNode {
 	}
 
 	public PlanTableNode left, right;
+	
+	
+	@Override
+	public Integer getCost() throws Exception{
+		return getChild(0).getCost() + getChild(1).getCost() + getMyCost();
+	}
+	
+	
+	private Integer getMyCost() throws Exception {
+		 Integer leftChildRetrievalCost= !(getChild(0) instanceof PlanRelationNode) ? 0 
+					: CostEstimator.getCostOfLinear( getChild(0).getTable().getStatistics().getBlocksOnDisk() );
+		 
+		 Integer rightChildRetrievalCost= !(getChild(1) instanceof PlanRelationNode) ? 0 
+					: CostEstimator.getCostOfLinear( getChild(1).getTable().getStatistics().getBlocksOnDisk() );
+		 
+		 return leftChildRetrievalCost + rightChildRetrievalCost;
+	}
+	
+	
 
 }

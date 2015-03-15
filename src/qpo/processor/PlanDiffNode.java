@@ -1,6 +1,9 @@
 package qpo.processor;
 
+import qpo.data.info.CostEstimator;
 import qpo.data.model.Attribute;
+import qpo.data.model.JoinInfo;
+import qpo.data.model.JoinTypeEnum;
 import qpo.data.model.Table;
 
 public class PlanDiffNode extends PlanTableNode {
@@ -50,6 +53,7 @@ public class PlanDiffNode extends PlanTableNode {
 		table.getStatistics().setCardinality(leftTable.getStatistics().getCardinality() - rightTable.getStatistics().getCardinality() / 2);
 
 		// TODO diff logic merge tables
+		setJoinInfo( CostEstimator.getCheapestDiff(this) );
 		
 		return table;
 	}
@@ -90,4 +94,26 @@ public class PlanDiffNode extends PlanTableNode {
 	
 	public PlanTableNode left, right;
 
+	
+	
+	private JoinTypeEnum joinType;
+	private Integer myCost;
+	public void setJoinInfo(JoinInfo joinInfo) {
+		joinType = joinInfo.getJoinType();
+		myCost = joinInfo.getCostTime();
+	}
+	
+	
+	@Override
+	public Integer getCost() throws Exception{
+		return getChild(0).getCost() + getChild(1).getCost() + getMyCost();
+	}
+	
+	
+	private Integer getMyCost() throws Exception {
+		return myCost; 
+	}
+	
+	
+	
 }

@@ -174,12 +174,23 @@ public class PlanJoinNode extends PlanTableNode {
 	}
 
 	
+	private Integer myCost;
+
 	public void setJoinInfo(JoinInfo joinInfo) {
 		joinType = joinInfo.getJoinType();
-		//setM_cost(joinInfo.getCostTime());
+		myCost = joinInfo.getCostTime();
 	}
 	
 	
+	@Override
+	public Integer getCost() throws Exception{
+		return getChild(0).getCost() + getChild(1).getCost() + getMyCost();
+	}
+	
+	
+	private Integer getMyCost() throws Exception {
+		return myCost; 
+	}
 	
 
 }
