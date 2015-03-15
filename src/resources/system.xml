@@ -9,7 +9,7 @@
 	<no-of-buffers>1</no-of-buffers>
 	<buffer-size>4096000</buffer-size>
 	<page-size>4096</page-size>
-	<pages-per-buffer>1000</pages-per-buffer>
+	<pages-per-buffer>50</pages-per-buffer>
 
 </system-properties>
 

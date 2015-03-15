@@ -176,7 +176,7 @@ public class PlanJoinNode extends PlanTableNode {
 	
 	public void setJoinInfo(JoinInfo joinInfo) {
 		joinType = joinInfo.getJoinType();
-		setM_cost(joinInfo.getCostIO());
+		//setM_cost(joinInfo.getCostTime());
 	}
 	
 	

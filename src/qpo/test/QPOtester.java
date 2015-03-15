@@ -29,7 +29,7 @@ public class QPOtester {
 
 	private void testJoinCost(QueryParser parser) throws Exception {
 //		String query = "proj[Category.ID, pname,cat_name](join[Product.category_fk=Category.ID or Product.ID=ID](sel [ID<5 and (pcode like 'c0%' or not 1=2)](Product))(Category))";
-		String query = "join[Product.category_fk=Category.ID](Product)(Category)";
+		String query = "join[OrderItem.product_fk=Product.ID](OrderItem)(Product)";
 		
 		PlanNode plan = parser.createPlan(query);
 		
@@ -38,7 +38,7 @@ public class QPOtester {
 		JoinInfo joinInfo = CostEstimator.getCheapestJoin(joinNode);
 		
 		System.out.println("Join Type = " + joinInfo.getJoinType() );
-		System.out.println("Join Cost = " + joinInfo.getCostIO() );
+		System.out.println("Join Cost = " + joinInfo.getCostTime() );
 		
 	}
 	
