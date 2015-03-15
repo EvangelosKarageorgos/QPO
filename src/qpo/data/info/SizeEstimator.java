@@ -21,7 +21,7 @@ public class SizeEstimator {
 			return getConjuctionRecords(table, (PlanConjunctionNode)predicate);
 			
 		else if(predicate instanceof PlanDisjunctionNode)
-			getDisjuctionRecords(table, (PlanDisjunctionNode)predicate);
+			return getDisjuctionRecords(table, (PlanDisjunctionNode)predicate);
 		
 		
 		return table.getStatistics().getCardinality()/2;
@@ -32,24 +32,30 @@ public class SizeEstimator {
 		
 		Double cardinalityNr = (double)table.getStatistics().getCardinality();
 		Double conjustionEstimation = 1.0;
+		Integer intermediateRes = 1;
 		
 		for(PlanPredicateNode predNode: conPredicate.predicates){
-			conjustionEstimation = conjustionEstimation * ( (double)getEstimatedRecords(table, predNode) /cardinalityNr);
+//			conjustionEstimation = conjustionEstimation * ( (double)getEstimatedRecords(table, predNode) /cardinalityNr);
+			conjustionEstimation = conjustionEstimation * (double)getEstimatedRecords(table, predNode) ;
 		}
 		
-		return (int)(cardinalityNr * conjustionEstimation);
+//		return (int)(cardinalityNr * conjustionEstimation);
+		conjustionEstimation = (double)(conjustionEstimation/Math.pow(cardinalityNr, conPredicate.predicates.size()));
+		intermediateRes = (int) (cardinalityNr * conjustionEstimation);
+		
+		return (intermediateRes>1) ? intermediateRes : 1;
 	}
 	
 	private static Integer getDisjuctionRecords(Table table, PlanDisjunctionNode disPredicate){
 		
-		Integer cardinalityNr = table.getStatistics().getCardinality();
-		Integer disjustionEstimation = 1;
+		Double cardinalityNr = (double)table.getStatistics().getCardinality();
+		Double disjustionEstimation = 1.0;
 	
 		for(PlanPredicateNode predNode: disPredicate.predicates){
-			disjustionEstimation = disjustionEstimation * ( 1-(getEstimatedRecords(table, predNode) /cardinalityNr));
+			disjustionEstimation = disjustionEstimation * ( 1-((double)getEstimatedRecords(table, predNode) /cardinalityNr));
 		}
 		
-		return cardinalityNr * (1-disjustionEstimation);
+		return (int) (cardinalityNr * (1-disjustionEstimation));
 	}
 	
 	private static Integer getNegationRecords(Table table, PlanNegationNode negPredicate){
@@ -96,7 +102,7 @@ public class SizeEstimator {
 			case greaterThan:
 				return getEstimatedRecordsRangeOverValue(attr, val);
 			case lessThan:
-				return getEstimatedRecordsRangeOverValue(attr, val);
+				return getEstimatedRecordsRangeUnderValue(attr, val);
 			case like:
 				return table.getStatistics().getCardinality() / 10;
 			default:
@@ -129,26 +135,41 @@ public class SizeEstimator {
 	
 	private static Integer getJoinConjuctionRecords(Table left, Table right, PlanConjunctionNode conPredicate){
 		
-		Integer cardinalityNr = left.getStatistics().getCardinality()*right.getStatistics().getCardinality();
-		Integer conjustionEstimation = 1;
+//		Integer cardinalityNr = left.getStatistics().getCardinality()*right.getStatistics().getCardinality();
+//		Integer conjustionEstimation = 1;
+//		
+//		for(PlanPredicateNode predNode: conPredicate.predicates){
+//			conjustionEstimation = conjustionEstimation * ( getJoinEstimatedRecords(left, right, predNode) /cardinalityNr);
+//		}
+//		
+//		return cardinalityNr * conjustionEstimation;
+		
+		Double cardinalityNr = (double)left.getStatistics().getCardinality()*right.getStatistics().getCardinality();
+		Double conjustionEstimation = 1.0;
+		Integer intermediateRes = 1;
 		
 		for(PlanPredicateNode predNode: conPredicate.predicates){
-			conjustionEstimation = conjustionEstimation * ( getJoinEstimatedRecords(left, right, predNode) /cardinalityNr);
+//			conjustionEstimation = conjustionEstimation * ( (double)getEstimatedRecords(table, predNode) /cardinalityNr);
+			conjustionEstimation = conjustionEstimation * (double)getJoinEstimatedRecords(left, right, predNode) ;
 		}
 		
-		return cardinalityNr * conjustionEstimation;
+//		return (int)(cardinalityNr * conjustionEstimation);
+		conjustionEstimation = (double)(conjustionEstimation/Math.pow(cardinalityNr, conPredicate.predicates.size()));
+		intermediateRes = (int) (cardinalityNr * conjustionEstimation);
+		
+		return (intermediateRes>1) ? intermediateRes : 1;
 	}
 	
 	private static Integer getJoinDisjuctionRecords(Table left, Table right, PlanDisjunctionNode disPredicate){
 		
-		Integer cardinalityNr = left.getStatistics().getCardinality()*right.getStatistics().getCardinality();
-		Integer disjustionEstimation = 1;
+		Double cardinalityNr = (double)left.getStatistics().getCardinality()*right.getStatistics().getCardinality();
+		Double disjustionEstimation = 1.0;
 	
 		for(PlanPredicateNode predNode: disPredicate.predicates){
 			disjustionEstimation = disjustionEstimation * ( 1-(getJoinEstimatedRecords(left, right, predNode) /cardinalityNr));
 		}
 		
-		return cardinalityNr * (1-disjustionEstimation);
+		return (int)(cardinalityNr * (1-disjustionEstimation));
 	}
 	
 	private static Integer getJoinNegationRecords(Table left, Table right, PlanNegationNode negPredicate){
