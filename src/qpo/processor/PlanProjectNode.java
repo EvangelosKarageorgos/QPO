@@ -87,6 +87,14 @@ public class PlanProjectNode extends PlanTableNode {
 		if(index==0)
 			table = node;
 	}
+	
+	public PlanTableNode moveProjectsDown(PlanTableNode root) throws Exception{
+		moveDownwards();
+		root = getRootNode();
+		root = super.moveProjectsDown(root);
+		return root;
+	}
+
 	public boolean moveDownwards() throws Exception{
 		if(table.getNumOfChildren()==1){
 			boolean canMove = true;

@@ -61,7 +61,8 @@ public class PlanSelectNode extends PlanTableNode {
 		if(value instanceof PlanAttributeValueNode){
 			PlanAttributeValueNode pan = (PlanAttributeValueNode)value;
 			if(!pan.bindToTable(table))
-				throw new Exception("Attribute not found");
+				if(!pan.bindToTable(table))
+					throw new Exception("Attribute not found");
 		}
 	}
 	
@@ -93,11 +94,17 @@ public class PlanSelectNode extends PlanTableNode {
 			table = node;
 	}
 
-	
-	public boolean moveDownwards(){
+	public PlanTableNode moveSelectsDown(PlanTableNode root) throws Exception{
+		moveDownwards();
+		root = getRootNode();
+		root = super.moveSelectsDown(root);
+		return root;
+	}
+
+	public boolean moveDownwards() throws Exception{
 		if(table.getNumOfChildren()==1){
 			if(table instanceof PlanSelectNode){
-				predicate = predicate.mergeWith(((PlanSelectNode)table).predicate);
+				predicate = predicate.mergeWith(((PlanSelectNode)table).predicate, ((PlanSelectNode)table).getTable(), null);
 				table.getChild(0).setParent(this);
 				table = table.getChild(0);
 				invalidate();
@@ -126,9 +133,18 @@ public class PlanSelectNode extends PlanTableNode {
 			return moveDownwards();
 		}
 		if(table instanceof PlanJoinNode){
-			((PlanJoinNode)table).predicate = ((PlanJoinNode)table).predicate.mergeWith(predicate); 
+			((PlanJoinNode)table).predicate = ((PlanJoinNode)table).predicate.mergeWith(predicate, ((PlanJoinNode)table).left.getTable(), ((PlanJoinNode)table).right.getTable()); 
 			
-			
+			if(getParent()!=null){
+				if(getParent().getChild(0)==(PlanTableNode)this){
+					getParent().setChild(0, table);
+				} else {
+					getParent().setChild(1, table);
+				}
+			}
+			table.setParent(getParent());
+			table.invalidate();
+			//((PlanJoinNode)table).extractSelectOperations();
 			//moveDownwardsOperation(0, 0);
 			//invalidate();
 			return false;

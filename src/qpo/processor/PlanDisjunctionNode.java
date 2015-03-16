@@ -44,6 +44,10 @@ public class PlanDisjunctionNode extends PlanPredicateNode {
 			for(PlanPredicateNode p : predicates)
 				p.fillUniqueAttributes(attributeList);
 	}	
+	protected void getAllAttributes(List<Attribute> attributes){
+		for(PlanPredicateNode p : predicates)
+			p.getAllAttributes(attributes);
+	}
 
 
 	public List<PlanPredicateNode> predicates;

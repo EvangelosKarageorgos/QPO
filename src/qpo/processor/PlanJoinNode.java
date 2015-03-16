@@ -1,5 +1,7 @@
 package qpo.processor;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import qpo.data.info.Catalog;
@@ -153,6 +155,185 @@ public class PlanJoinNode extends PlanTableNode {
 		output = output + "\n"+ps+"}";
 		
 		return output;
+	}
+	
+	public PlanTableNode moveSelectsDown(PlanTableNode root) throws Exception{
+		extractSelectOperations();
+		root = getRootNode();
+		//System.out.println(root);
+		root = super.moveSelectsDown(root);
+		return root;
+	}
+
+	public void extractSelectOperations() throws Exception{
+
+		if(predicate instanceof PlanComparisonNode){
+			List<PlanPredicateNode> leftLst = new ArrayList<PlanPredicateNode>();
+			List<PlanPredicateNode> rightLst = new ArrayList<PlanPredicateNode>();
+			//for(PlanPredicateNode p : ((PlanConjunctionNode)predicate).predicates){
+			PlanPredicateNode p = predicate;
+
+			List<Attribute> attrList = p.getUniqueAttributes();
+			List<Attribute> leftAttrList = new ArrayList<Attribute>();
+			List<Attribute> rightAttrList = new ArrayList<Attribute>();
+			boolean isFromLeft = false;
+			boolean isFromRight = false;
+			boolean utilizeLeft = false;
+			boolean utilizeRight = false;
+			for(Attribute a : attrList){
+				if(a.getTable().getUid().equals(left.getTable().getUid()))
+					isFromLeft = true;
+				if(a.getTable().getUid().equals(right.getTable().getUid()))
+					isFromRight = true;
+			}
+			if((!isFromLeft && !isFromRight) || (isFromLeft && !isFromRight))
+				leftLst.add(p.clone());
+			if((!isFromLeft && !isFromRight) || (!isFromLeft && isFromRight))
+				rightLst.add(p.clone());
+			if((isFromLeft ^ isFromRight) || (!isFromLeft && !isFromRight))
+				predicate = null;
+			if(leftLst.size()>0){
+				PlanSelectNode node = new PlanSelectNode();
+				if(leftLst.size()==1){
+					node.predicate = leftLst.get(0);
+				} else {
+					PlanConjunctionNode pred = new PlanConjunctionNode();
+					pred.predicates = leftLst;
+					node.predicate = pred;
+				}
+				node.table = left;
+				left.setParent(node);
+				node.setParent(this);
+				left = node;
+				node.moveDownwards();
+			}
+			if(rightLst.size()>0){
+				PlanSelectNode node = new PlanSelectNode();
+				if(leftLst.size()==1){
+					node.predicate = leftLst.get(0);
+				} else {
+					PlanConjunctionNode pred = new PlanConjunctionNode();
+					pred.predicates = leftLst;
+					node.predicate = pred;
+				}
+				node.table = right;
+				right.setParent(node);
+				node.setParent(this);
+				right = node;
+				node.moveDownwards();
+			}
+		} else if(predicate instanceof PlanConjunctionNode){
+			List<PlanPredicateNode> leftLst = new ArrayList<PlanPredicateNode>();
+			List<PlanPredicateNode> rightLst = new ArrayList<PlanPredicateNode>();
+			List<PlanPredicateNode> toRemove = new LinkedList<PlanPredicateNode>();
+			for(PlanPredicateNode p : ((PlanConjunctionNode)predicate).predicates){
+				List<Attribute> attrList = p.getUniqueAttributes();
+				List<Attribute> leftAttrList = new ArrayList<Attribute>();
+				List<Attribute> rightAttrList = new ArrayList<Attribute>();
+				boolean isFromLeft = false;
+				boolean isFromRight = false;
+				boolean utilizeLeft = false;
+				boolean utilizeRight = false;
+				for(Attribute a : attrList){
+					if(a.getTable().getUid().equals(left.getTable().getUid()))
+						isFromLeft = true;
+					if(a.getTable().getUid().equals(right.getTable().getUid()))
+						isFromRight = true;
+				}
+				if((!isFromLeft && !isFromRight) || (isFromLeft && !isFromRight))
+					leftLst.add(p.clone());
+				if((!isFromLeft && !isFromRight) || (!isFromLeft && isFromRight))
+					rightLst.add(p.clone());
+				if((isFromLeft ^ isFromRight) || (!isFromLeft && !isFromRight))
+					toRemove.add(p);
+			}
+			for(PlanPredicateNode p : toRemove)
+				((PlanConjunctionNode)predicate).predicates.remove(p);
+			if(((PlanConjunctionNode)predicate).predicates.size()==0)
+				predicate = null;
+			if(leftLst.size()>0){
+				PlanSelectNode node = new PlanSelectNode();
+				if(leftLst.size()==1){
+					node.predicate = leftLst.get(0);
+				} else {
+					PlanConjunctionNode pred = new PlanConjunctionNode();
+					pred.predicates = leftLst;
+					node.predicate = pred;
+				}
+				node.table = left;
+				left.setParent(node);
+				node.setParent(this);
+				left = node;
+				node.moveDownwards();
+			}
+			if(rightLst.size()>0){
+				PlanSelectNode node = new PlanSelectNode();
+				if(leftLst.size()==1){
+					node.predicate = rightLst.get(0);
+				} else {
+					PlanConjunctionNode pred = new PlanConjunctionNode();
+					pred.predicates = rightLst;
+					node.predicate = pred;
+				}
+				node.table = right;
+				right.setParent(node);
+				node.setParent(this);
+				right = node;
+				node.moveDownwards();
+			}
+			invalidate();
+		}
+	}
+	
+	private void createChildSelectNode(int child, List<PlanPredicateNode> predicates, int utilization){
+		
+	}
+	
+	private int classifyComparisonNodeUtilization(PlanComparisonNode cnode, List<Attribute> leftAttrList, List<Attribute> rightAttrList){
+		boolean isFromLeft = false;
+		boolean isFromRight = false;
+		boolean utilizeLeft = false;
+		boolean utilizeRight = false;
+		if(cnode.left instanceof PlanAttributeValueNode){
+			PlanAttributeValueNode pan = (PlanAttributeValueNode)cnode.left;
+			for(Attribute a : leftAttrList){
+				if((pan.tableName.length()==0||a.getRelationName().length()==0||pan.tableName.equalsIgnoreCase(a.getRelationName())) && pan.attributeName.equalsIgnoreCase(a.getName())){
+					isFromLeft = true;
+					break;
+				}
+			}
+			for(Attribute a : rightAttrList){
+				if((pan.tableName.length()==0||a.getRelationName().length()==0||pan.tableName.equalsIgnoreCase(a.getRelationName())) && pan.attributeName.equalsIgnoreCase(a.getName())){
+					isFromRight = true;
+					break;
+				}
+			}
+		}
+		if(cnode.right instanceof PlanAttributeValueNode){
+			PlanAttributeValueNode pan = (PlanAttributeValueNode)cnode.right;
+			for(Attribute a : leftAttrList){
+				if((pan.tableName.length()==0||a.getRelationName().length()==0||pan.tableName.equalsIgnoreCase(a.getRelationName())) && pan.attributeName.equalsIgnoreCase(a.getName())){
+					isFromLeft = true;
+					break;
+				}
+			}
+			for(Attribute a : rightAttrList){
+				if((pan.tableName.length()==0||a.getRelationName().length()==0||pan.tableName.equalsIgnoreCase(a.getRelationName())) && pan.attributeName.equalsIgnoreCase(a.getName())){
+					isFromRight = true;
+					break;
+				}
+			}
+		}
+		if((isFromLeft && isFromRight) || (!isFromLeft && !isFromRight)){
+			utilizeLeft = true;
+			utilizeRight = false;
+			return 3;
+		}
+		if(isFromLeft)
+			return 1;
+		if(isFromRight)
+			return 2;
+		return 0;
 	}
 	
 	public int getNumOfChildren(){

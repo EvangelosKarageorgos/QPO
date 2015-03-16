@@ -74,6 +74,34 @@ public class PlanTableNode extends PlanNode {
 	public void setChild(int index, PlanTableNode node){
 		
 	}
+	
+	public PlanTableNode moveSelectsDown() throws Exception{
+		return moveSelectsDown(this);
+	}
+	public PlanTableNode moveProjectsDown() throws Exception{
+		return moveProjectsDown(this);
+	}
+	
+	public PlanTableNode moveSelectsDown(PlanTableNode root) throws Exception{
+		if(getNumOfChildren()==1){
+			root = getChild(0).moveSelectsDown(root);
+		} else if(getNumOfChildren()==2){
+			root = getChild(0).moveSelectsDown(root);
+			root = getChild(1).moveSelectsDown(root);
+		}
+		return root;
+	}
+
+	public PlanTableNode moveProjectsDown(PlanTableNode root) throws Exception{
+		if(getNumOfChildren()==1){
+			root = getChild(0).moveProjectsDown(root);
+		} else if(getNumOfChildren()==2){
+			root = getChild(0).moveProjectsDown(root);
+			root = getChild(1).moveProjectsDown(root);
+		}
+		return root;
+	}
+	
 	public void invalidate(){
 		isValid = false;
 		if(getParent()!=null)

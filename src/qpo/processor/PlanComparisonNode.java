@@ -68,6 +68,13 @@ public class PlanComparisonNode extends PlanPredicateNode{
 		if(right!=null && (right instanceof PlanAttributeValueNode))((PlanAttributeValueNode)right).fillUniqueAttributes(attributeList);
 	}
 	
+	protected void getAllAttributes(List<Attribute> attributes){
+		if(left instanceof PlanAttributeValueNode)
+			attributes.add(((PlanAttributeValueNode)left).attribute);
+		if(left instanceof PlanAttributeValueNode)
+			attributes.add(((PlanAttributeValueNode)left).attribute);
+	}
+	
 	public PlanValueNode left;
 	public PlanValueNode right;
 	public ComparisonOperatorType operator;

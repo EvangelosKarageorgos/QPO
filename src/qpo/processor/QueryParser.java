@@ -509,12 +509,12 @@ public class QueryParser extends Parser {
 		return result;
 	}
 	
-	public PlanNode createPlan(String query) throws Exception{
+	public PlanTableNode createPlan(String query) throws Exception{
 		SyntaxNode rootNode = this.recognize(query);
 		return createPlan(rootNode);
 	}
 
-	public PlanNode createPlan(SyntaxNode rootNode) throws Exception{
+	public PlanTableNode createPlan(SyntaxNode rootNode) throws Exception{
 		if(!rootNode.isRecognized)
 			throw new Exception("Query syntax error");
 		PlanTableNode result = createPlanTableNode(rootNode);

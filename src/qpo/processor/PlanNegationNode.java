@@ -29,6 +29,10 @@ public class PlanNegationNode extends PlanPredicateNode {
 	protected void fillUniqueAttributes(List<Attribute> attributeList){
 		if(predicate!=null)predicate.fillUniqueAttributes(attributeList);
 	}
+	protected void getAllAttributes(List<Attribute> attributes){
+		predicate.getAllAttributes(attributes);
+	}
+
 
 	public PlanPredicateNode predicate;
 }
