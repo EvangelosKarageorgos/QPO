@@ -76,10 +76,24 @@ public class PlanTableNode extends PlanNode {
 	}
 	
 	public PlanTableNode moveSelectsDown() throws Exception{
-		return moveSelectsDown(this);
+		PlanTableNode plan = moveSelectsDown(this);
+		plan.getTable();
+		return plan;
 	}
 	public PlanTableNode moveProjectsDown() throws Exception{
-		return moveProjectsDown(this);
+		PlanTableNode plan = moveProjectsDown(this);
+		plan.getTable();
+		return plan;
+	}
+	
+	public PlanTableNode optimizeJoinsOrientation() throws Exception{
+		if(getNumOfChildren()==1){
+			getChild(0).optimizeJoinsOrientation();
+		} else if(getNumOfChildren()==2){
+			getChild(0).optimizeJoinsOrientation();
+			getChild(1).optimizeJoinsOrientation();
+		}
+		return this;
 	}
 	
 	public PlanTableNode moveSelectsDown(PlanTableNode root) throws Exception{

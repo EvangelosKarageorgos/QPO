@@ -59,7 +59,7 @@ public class PlanUnionNode extends PlanTableNode {
 		
 		String output = "";
 		try{
-			output = ps+"Union "+getTable().toString(padding)+" {";	
+			output = ps+"Union "+getTable().toString(padding)+" "+getCost()+" cost"+" {";	
 		}catch(Exception ex){}
 
 		output = output + "\n"+left.toString(padding+1);

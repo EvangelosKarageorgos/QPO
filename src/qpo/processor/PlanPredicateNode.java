@@ -45,6 +45,29 @@ public class PlanPredicateNode extends PlanNode {
 
 	public PlanPredicateNode mergeWith(PlanPredicateNode predicate, Table table1, Table table2){
 		PlanPredicateNode res = mergeWith(predicate);
+		res.distributeAttributeReferences(table1, table2);
+		/*List<Attribute> attributes = new ArrayList<Attribute>();
+		res.getAllAttributes(attributes);
+		for(Attribute a : attributes){
+			if(table1!=null){
+				for(Attribute ta : table1.getAttributes()){
+					if((ta.getRelationName().length()==0||a.getRelationName().length()==0||ta.getRelationName().equalsIgnoreCase(a.getRelationName())) && ta.getName().equalsIgnoreCase(a.getName())){
+						a.setTable(ta.getTable());
+					}
+				}
+			}
+			if(table2!=null){
+				for(Attribute ta : table2.getAttributes()){
+					if((ta.getRelationName().length()==0||a.getRelationName().length()==0||ta.getRelationName().equalsIgnoreCase(a.getRelationName())) && ta.getName().equalsIgnoreCase(a.getName())){
+						a.setTable(ta.getTable());
+					}
+				}
+			}
+		}*/
+		return res;
+	}
+	
+	public void distributeAttributeReferences(Table table1, Table table2){
 		List<Attribute> attributes = new ArrayList<Attribute>();
 		getAllAttributes(attributes);
 		for(Attribute a : attributes){
@@ -63,7 +86,7 @@ public class PlanPredicateNode extends PlanNode {
 				}
 			}
 		}
-		return res;
+
 	}
 	
 	protected void getAllAttributes(List<Attribute> attributes){

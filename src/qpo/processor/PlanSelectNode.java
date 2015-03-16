@@ -71,10 +71,10 @@ public class PlanSelectNode extends PlanTableNode {
 		String ps = new String(new char[padding*2]).replace('\0', ' ');
 		String output = "";
 		try{
-			output = ps+"Select "+getTable().toString(padding)+" {";	
+			output = ps+"Select "+getTable().toString(padding)+" "+getCost()+" cost"+" {";	
 		}catch(Exception ex){}
 		output = output + "\n"+table.toString(padding+1);
-		output = output + "\n"+ps+"  where "+predicate.toString();
+		if(predicate!=null) output = output + "\n"+ps+"  where "+predicate;
 		output = output + "\n"+ps+"}";
 		
 		return output;
@@ -133,7 +133,11 @@ public class PlanSelectNode extends PlanTableNode {
 			return moveDownwards();
 		}
 		if(table instanceof PlanJoinNode){
-			((PlanJoinNode)table).predicate = ((PlanJoinNode)table).predicate.mergeWith(predicate, ((PlanJoinNode)table).left.getTable(), ((PlanJoinNode)table).right.getTable()); 
+			if(((PlanJoinNode)table).predicate == null){
+				((PlanJoinNode)table).predicate = predicate;
+				predicate.distributeAttributeReferences(((PlanJoinNode)table).left.getTable(), ((PlanJoinNode)table).right.getTable());
+			} else
+				((PlanJoinNode)table).predicate = ((PlanJoinNode)table).predicate.mergeWith(predicate, ((PlanJoinNode)table).left.getTable(), ((PlanJoinNode)table).right.getTable()); 
 			
 			if(getParent()!=null){
 				if(getParent().getChild(0)==(PlanTableNode)this){
@@ -144,7 +148,7 @@ public class PlanSelectNode extends PlanTableNode {
 			}
 			table.setParent(getParent());
 			table.invalidate();
-			//((PlanJoinNode)table).extractSelectOperations();
+			((PlanJoinNode)table).extractSelectOperations();
 			//moveDownwardsOperation(0, 0);
 			//invalidate();
 			return false;

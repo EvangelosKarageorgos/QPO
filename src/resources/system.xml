@@ -2,9 +2,9 @@
 
 <system-properties>
 
-	<latency>100</latency>
-	<transfer>300</transfer>
-	<write>500</write>
+	<latency>1</latency>
+	<transfer>3</transfer>
+	<write>5</write>
 	
 	<no-of-buffers>1</no-of-buffers>
 	<buffer-size>4096000</buffer-size>

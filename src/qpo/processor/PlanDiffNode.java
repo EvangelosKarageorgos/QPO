@@ -63,7 +63,7 @@ public class PlanDiffNode extends PlanTableNode {
 		
 		String output = "";
 		try{
-			output = ps+"Diff "+getTable().toString(padding)+" {";	
+			output = ps+"Diff "+getTable().toString(padding)+" "+getCost()+" cost"+" {";	
 		}catch(Exception ex){}
 
 		output = output + "\n"+left.toString(padding+1);

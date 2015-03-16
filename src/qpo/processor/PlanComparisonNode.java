@@ -71,8 +71,8 @@ public class PlanComparisonNode extends PlanPredicateNode{
 	protected void getAllAttributes(List<Attribute> attributes){
 		if(left instanceof PlanAttributeValueNode)
 			attributes.add(((PlanAttributeValueNode)left).attribute);
-		if(left instanceof PlanAttributeValueNode)
-			attributes.add(((PlanAttributeValueNode)left).attribute);
+		if(right instanceof PlanAttributeValueNode)
+			attributes.add(((PlanAttributeValueNode)right).attribute);
 	}
 	
 	public PlanValueNode left;

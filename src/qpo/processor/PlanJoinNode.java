@@ -146,12 +146,12 @@ public class PlanJoinNode extends PlanTableNode {
 		
 		String output = "";
 		try{
-			output = ps+"Join "+getTable().toString(padding)+" {";	
+			output = ps+joinType+" Join "+getTable().toString(padding)+" "+getCost()+" cost"+" {";	
 		}catch(Exception ex){}
 
 		output = output + "\n"+left.toString(padding+1);
 		output = output + "\n"+right.toString(padding+1);
-		output = output + "\n"+ps+"  on "+predicate;
+		if(predicate!=null)output = output + "\n"+ps+"  on "+predicate;
 		output = output + "\n"+ps+"}";
 		
 		return output;
@@ -161,10 +161,27 @@ public class PlanJoinNode extends PlanTableNode {
 		extractSelectOperations();
 		root = getRootNode();
 		//System.out.println(root);
-		root = super.moveSelectsDown(root);
+		//root = super.moveSelectsDown(root);
 		return root;
 	}
-
+	
+	public PlanTableNode optimizeJoinsOrientation() throws Exception{
+		super.optimizeJoinsOrientation();
+		PlanTableNode temp;
+		PlanJoinNode tmp = clone();
+		
+		temp = tmp.left;
+		tmp.left = tmp.right;
+		tmp.right = temp;
+		tmp.setJoinInfo( CostEstimator.getCheapestJoin(tmp) );
+		if(tmp.getCost()<getCost()){
+			temp = left;
+			left = right;
+			right = temp;
+			invalidate();
+		}
+		return this;
+	}
 	public void extractSelectOperations() throws Exception{
 
 		if(predicate instanceof PlanComparisonNode){
@@ -264,11 +281,13 @@ public class PlanJoinNode extends PlanTableNode {
 				left.setParent(node);
 				node.setParent(this);
 				left = node;
+				node.invalidate();
+				node.constructTable();
 				node.moveDownwards();
 			}
 			if(rightLst.size()>0){
 				PlanSelectNode node = new PlanSelectNode();
-				if(leftLst.size()==1){
+				if(rightLst.size()==1){
 					node.predicate = rightLst.get(0);
 				} else {
 					PlanConjunctionNode pred = new PlanConjunctionNode();
@@ -279,9 +298,13 @@ public class PlanJoinNode extends PlanTableNode {
 				right.setParent(node);
 				node.setParent(this);
 				right = node;
+				node.invalidate();
+				node.constructTable();
 				node.moveDownwards();
 			}
-			invalidate();
+			predicate.distributeAttributeReferences(left.getTable(), right.getTable());
+			
+			//invalidate();
 		}
 	}
 	

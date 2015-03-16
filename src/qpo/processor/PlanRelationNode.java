@@ -27,7 +27,13 @@ public class PlanRelationNode extends PlanTableNode {
 	protected String toString(int padding){
 		String ps = new String(new char[padding*2]).replace('\0', ' ');
 		
-		String output = ps+"Relation "+relation;
+		String output = "";
+		try {
+			output = ps+"Relation "+relation+" "+getCost()+" cost";
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		return output;
 	}

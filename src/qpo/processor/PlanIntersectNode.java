@@ -67,7 +67,7 @@ public class PlanIntersectNode extends PlanTableNode {
 		
 		String output = "";
 		try{
-			output = ps+"Intersect "+getTable().toString(padding)+" {";	
+			output = ps+"Intersect "+getTable().toString(padding)+" "+getCost()+" cost"+" {";	
 		}catch(Exception ex){}
 
 		output = output + "\n"+left.toString(padding+1);

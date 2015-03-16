@@ -64,7 +64,7 @@ public class PlanProjectNode extends PlanTableNode {
 		
 		String output = "";
 		try{
-			output = ps+"Projection "+getTable().toString(padding);
+			output = ps+"Projection "+getTable().toString(padding)+" "+getCost()+" cost";
 		}catch(Exception ex){}
 		
 		output = output + "{\n";
@@ -120,7 +120,12 @@ public class PlanProjectNode extends PlanTableNode {
 						//break;
 					}
 				}
-				if(!canMove){
+				if(canMove){
+					PlanSelectNode sel = (PlanSelectNode)table;
+					moveDownwardsOperation(0, 0);
+					sel.predicate.distributeAttributeReferences(sel.table.getTable(), null);
+					return moveDownwards();
+				} else {
 					PlanProjectNode newProject = new PlanProjectNode();
 					newProject.table = table;
 					newProject.projectedAttributes = new ArrayList<PlanAttributeNode>();

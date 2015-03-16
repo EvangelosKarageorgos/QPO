@@ -157,9 +157,9 @@ public class QueryParser extends Parser {
 			.setImportant(true);
 
 		
-		Token relation_t = new Token("relations");
+		Token relation_t = new Token("relations").setCaseSensitivity(false);
 		
-		Token attribute_t = new Token("attributes");
+		Token attribute_t = new Token("attributes").setCaseSensitivity(false);
 
 		SyntaxElement relation = new SyntaxElementToken("relation")
 			.setToken(relation_t)
@@ -365,11 +365,15 @@ public class QueryParser extends Parser {
 		SyntaxElement selection = new SyntaxElementSyntax("select")
 			.addElement(word_sel)
 			.addElement(
-				new SyntaxElementSyntax()
-					.addElement(bropen)
-					.addElement(condition)
-					.addElement(brclose)
-					.setImportant(false)
+				new SyntaxElementChoice()
+					.addElement(
+						new SyntaxElementSyntax()
+							.addElement(bropen)
+							.addElement(condition)
+							.addElement(brclose)
+							.setImportant(false)
+					)
+					.addElement(new SyntaxElementNone().setTerminators(terms))
 			)
 			.addElement(
 				new SyntaxElementSyntax()
@@ -399,11 +403,15 @@ public class QueryParser extends Parser {
 		SyntaxElement join = new SyntaxElementSyntax("join")
 			.addElement(word_join)
 			.addElement(
-				new SyntaxElementSyntax()
-					.addElement(bropen)
-					.addElement(condition)
-					.addElement(brclose)
-					.setImportant(false)
+					new SyntaxElementChoice()
+					.addElement(
+						new SyntaxElementSyntax()
+							.addElement(bropen)
+							.addElement(condition)
+							.addElement(brclose)
+							.setImportant(false)
+					)
+					.addElement(new SyntaxElementNone().setTerminators(terms))
 			)
 			.addElement(
 				new SyntaxElementSyntax()
@@ -547,8 +555,13 @@ public class QueryParser extends Parser {
 
 	private PlanSelectNode createPlanSelectNode(SyntaxNode snode){
 		PlanSelectNode node = new PlanSelectNode();
-		node.predicate = createPlanPredicateNode(snode.children.get(0));
-		node.table = createPlanTableNode(snode.children.get(1));
+		if(snode.children.size()==1){
+			node.predicate = null;
+			node.table = createPlanTableNode(snode.children.get(0));
+		} else{
+			node.predicate = createPlanPredicateNode(snode.children.get(0));
+			node.table = createPlanTableNode(snode.children.get(1));
+		}
 		node.table.setParent(node);
 		return node;
 	}
@@ -566,9 +579,16 @@ public class QueryParser extends Parser {
 
 	private PlanJoinNode createPlanJoinNode(SyntaxNode snode){
 		PlanJoinNode node = new PlanJoinNode();
-		node.predicate = createPlanPredicateNode(snode.children.get(0));
-		node.left = createPlanTableNode(snode.children.get(1));
-		node.right = createPlanTableNode(snode.children.get(2));
+		if(snode.children.size()==2){
+			node.predicate = null;
+			node.left = createPlanTableNode(snode.children.get(0));
+			node.right = createPlanTableNode(snode.children.get(1));
+			
+		} else {
+			node.predicate = createPlanPredicateNode(snode.children.get(0));
+			node.left = createPlanTableNode(snode.children.get(1));
+			node.right = createPlanTableNode(snode.children.get(2));
+		}
 		node.left.setParent(node);
 		node.right.setParent(node);
 		return node;
