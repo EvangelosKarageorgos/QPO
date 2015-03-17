@@ -149,10 +149,7 @@ public class PlanSelectNode extends PlanTableNode {
 			table.setParent(getParent());
 			table.invalidate();
 			((PlanJoinNode)table).extractSelectOperations();
-			//moveDownwardsOperation(0, 0);
-			//invalidate();
 			return false;
-			//return moveDownwards();
 		}
 
 		if(table.getNumOfChildren()!=1)

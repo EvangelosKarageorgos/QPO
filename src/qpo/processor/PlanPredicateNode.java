@@ -26,6 +26,20 @@ public class PlanPredicateNode extends PlanNode {
 		return result;
 	}
 	
+	public List<Attribute> getUniqueAttributesForTable(Table table){
+		List<Attribute> result = new ArrayList<Attribute>();
+		for(Attribute a : getUniqueAttributes()){
+			for(Attribute ta : table.getAttributes()){
+				if((ta.getRelationName().length()==0||a.getRelationName().length()==0||ta.getRelationName().equalsIgnoreCase(a.getRelationName())) && ta.getName().equalsIgnoreCase(a.getName())){
+					result.add(a);
+					break;
+				}
+			}
+		}
+		return result;
+	}
+	
+	
 	public PlanPredicateNode mergeWith(PlanPredicateNode predicate){
 		PlanConjunctionNode res = null;
 		if(predicate==null)
@@ -46,24 +60,6 @@ public class PlanPredicateNode extends PlanNode {
 	public PlanPredicateNode mergeWith(PlanPredicateNode predicate, Table table1, Table table2){
 		PlanPredicateNode res = mergeWith(predicate);
 		res.distributeAttributeReferences(table1, table2);
-		/*List<Attribute> attributes = new ArrayList<Attribute>();
-		res.getAllAttributes(attributes);
-		for(Attribute a : attributes){
-			if(table1!=null){
-				for(Attribute ta : table1.getAttributes()){
-					if((ta.getRelationName().length()==0||a.getRelationName().length()==0||ta.getRelationName().equalsIgnoreCase(a.getRelationName())) && ta.getName().equalsIgnoreCase(a.getName())){
-						a.setTable(ta.getTable());
-					}
-				}
-			}
-			if(table2!=null){
-				for(Attribute ta : table2.getAttributes()){
-					if((ta.getRelationName().length()==0||a.getRelationName().length()==0||ta.getRelationName().equalsIgnoreCase(a.getRelationName())) && ta.getName().equalsIgnoreCase(a.getName())){
-						a.setTable(ta.getTable());
-					}
-				}
-			}
-		}*/
 		return res;
 	}
 	
@@ -96,4 +92,6 @@ public class PlanPredicateNode extends PlanNode {
 	protected void fillUniqueAttributes(List<Attribute> attributeList){
 		
 	}
+	
+	
 }

@@ -37,6 +37,7 @@ public class PlanAttributeValueNode extends PlanValueNode {
 					throw new Exception("Attribute ambiguity");
 				found = true;
 				attribute = a;
+				tableName = a.getRelationName();
 			}
 		}
 		return found;
@@ -48,7 +49,8 @@ public class PlanAttributeValueNode extends PlanValueNode {
 	protected void fillUniqueAttributes(List<Attribute> attributeList){
 		boolean found = false;
 		for(Attribute a : attributeList){
-			if(a.getName().equalsIgnoreCase(attribute.getName()) && a.getName().equalsIgnoreCase(attribute.getName())){
+			//if(a.getName().equalsIgnoreCase(attribute.getName()) && a.getName().equalsIgnoreCase(attribute.getName())){
+			if((attribute.getRelationName().length()==0||a.getRelationName().length()==0||attribute.getRelationName().equalsIgnoreCase(a.getRelationName())) && attribute.getName().equalsIgnoreCase(a.getName())){
 				found = true;
 				break;
 			}

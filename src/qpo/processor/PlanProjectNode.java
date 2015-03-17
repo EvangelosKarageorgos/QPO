@@ -245,9 +245,9 @@ public class PlanProjectNode extends PlanTableNode {
 					//break;
 				}
 			}
-	
+			boolean didMovement = false;
+			//if(!leftCanMove && !(((PlanJoinNode)table).left instanceof PlanRelationNode)){
 			if(!leftCanMove){
-	
 				PlanProjectNode newProject = new PlanProjectNode();
 				newProject.table = table;
 				newProject.projectedAttributes = new ArrayList<PlanAttributeNode>();
@@ -255,14 +255,18 @@ public class PlanProjectNode extends PlanTableNode {
 					newProject.projectedAttributes.add(a);
 				for(PlanAttributeNode a : newleftAttrList)
 					newProject.projectedAttributes.add(a);
-				table.setParent(newProject);
-				newProject.table = table;
-				table = newProject;
-				newProject.setParent(this);
-				newProject.moveDownwardsOperation(0, 0);
-				//newProject.invalidate();
-				newProject.moveDownwards();
+				if(!(((PlanJoinNode)table).left instanceof PlanRelationNode) || (((double)((((PlanJoinNode)table).left).getTable().getAttributes().size()) / (double)(newProject.projectedAttributes.size())) > 2)){
+					didMovement = true;
+					table.setParent(newProject);
+					newProject.table = table;
+					table = newProject;
+					newProject.setParent(this);
+					newProject.moveDownwardsOperation(0, 0);
+					//newProject.invalidate();
+					newProject.moveDownwards();
+				}
 			}
+			//if(!rightCanMove && !(((PlanJoinNode)table).right instanceof PlanRelationNode)){
 			if(!rightCanMove){
 	
 				PlanProjectNode newProject = new PlanProjectNode();
@@ -272,14 +276,19 @@ public class PlanProjectNode extends PlanTableNode {
 					newProject.projectedAttributes.add(a);
 				for(PlanAttributeNode a : newrightAttrList)
 					newProject.projectedAttributes.add(a);
-				table.setParent(newProject);
-				newProject.table = table;
-				table = newProject;
-				newProject.setParent(this);
-				newProject.moveDownwardsOperation(0, 1);
-				//newProject.invalidate();
-				newProject.moveDownwards();
+				if(!(((PlanJoinNode)table).right instanceof PlanRelationNode) || (((double)((((PlanJoinNode)table).right).getTable().getAttributes().size()) / (double)(newProject.projectedAttributes.size())) > 2)){
+					didMovement = true;
+					table.setParent(newProject);
+					newProject.table = table;
+					table = newProject;
+					newProject.setParent(this);
+					newProject.moveDownwardsOperation(0, 1);
+					//newProject.invalidate();
+					newProject.moveDownwards();
+				}
 			}
+			if(didMovement)
+				((PlanJoinNode)table).extractSelectOperations();
 		}
 		if(table instanceof PlanUnionNode){
 			PlanProjectNode newProject = new PlanProjectNode();

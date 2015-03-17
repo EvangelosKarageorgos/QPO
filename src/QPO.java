@@ -15,9 +15,6 @@ public class QPO {
 		
 		String query;
 		
-		// moni periptwsi poy pleon kanei bug sto optimization
-		//query = "proj[Category.ID, pname,cat_name](join[Product.category_fk=Category.ID or Product.ID=ID](sel [ID<5 and (pcode like 'c0%' or not 1=2)](Product))(Category))";
-		
 		// poly aplo poy deixnei ti diafora toy select me index
 		//query = "sel [ID<2 and (pcode like 'c0%' or not 1=2)](proj[ID, pcode](Product))";
 		
@@ -34,11 +31,11 @@ public class QPO {
 		//query = "proj[cname, pname, cat_name](sel[Customer.ID=5](join[category_fk=Category.ID](join[Product.ID=product_fk](join[OrderItem.customer_fk=Customer.ID](join[Nationality.ID=nationality_fk](Customer)(Nationality))(OrderItem))(Product))(Category)))";
 
 		//allo ena xaraktiristiko paradeigma
-		//query = "sel[Product.Id=10](join[category_fk=Category.Id](Category)(Product))";
+		query = "sel[Product.Id=10](join[category_fk=Category.Id](Category)(Product))";
 
 		
 		// gamw ta paradeigmata!!!
-		query = "proj[OrderItem.id, Product.pname, cat_name](sel[OrderItem.ID=10](join[product_fk=Product.Id](join[category_fk=Category.Id](Category)(Product))(OrderItem)))";
+		//query = "proj[OrderItem.id, Product.pname, cat_name](sel[OrderItem.ID=10](join[product_fk=Product.Id](join[category_fk=Category.Id](Category)(Product))(OrderItem)))";
 		
 		
 		
@@ -47,7 +44,7 @@ public class QPO {
 		//commandLoop();
 	}
 	
-	public static void commandLoop()
+	public static void commandLoop() throws Exception
 	{
 	    Scanner scan = new Scanner(System.in);
 	    String query = scan.nextLine();
@@ -58,8 +55,8 @@ public class QPO {
 	    }
 	}
 
-	public static void presentQuery(String query){
-    	try{
+	public static void presentQuery(String query) throws Exception{
+    	//try{
 	    	SyntaxNode snode = processor.getQuerySyntax(query);
 	    	System.out.println("------Query syntax-----");
 	    	System.out.println(snode);
@@ -72,10 +69,10 @@ public class QPO {
 	    	System.out.println("-----Optimized plan "+plan.getCost()+" msec ("+plan.getTable().getStatistics().getCardinality()+" records)-----");
 	    	System.out.println(plan);
     		
-    	} catch(Exception ex){
-    		System.out.println("Error :"+ex.getMessage());
-    		ex.printStackTrace();
-    	}
+    	//} catch(Exception ex){
+    		//System.out.println("Error :"+ex.getMessage());
+    		//ex.printStackTrace();
+    	//}
 		
 	}
 
