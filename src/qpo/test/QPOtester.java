@@ -74,6 +74,15 @@ public class QPOtester {
 		
 		String query = "proj[Product.ID, Product.pname](sel [(Product.ID>10 AND Product.ID<20) OR Product.ID=100 OR Product.ID=500] (Product) ) )";
 		
+		query = "proj[Product.ID, pcode]( join[category_fk=Category.ID and Category.id<20] ( sel[Product.ID<50](Product) ) (Category) )";
+		
+		
+		query = "proj[Product.ID, pcode]( join[product_fk=Product.ID] ( sel[Product.ID=7](Product) ) (OrderItem) )";
+		
+		query = "proj[Product.ID, pcode]    ( sel[Product.ID=7] (join[product_fk=Product.ID]  (Product) (OrderItem)) )";
+		
+		
+		
 		
 		PlanNode plan = parser.createPlan(query);
 		

@@ -198,12 +198,14 @@ public class SizeEstimator {
 				if(leftAttr.attribute.getKeyStatus()==KeyStatusEnum.Foreign
 					&& leftAttr.attribute.getReferencedAttributeName().equalsIgnoreCase(rightAttr.attribute.getName())
 					&& leftAttr.attribute.getReferencedTableName().equalsIgnoreCase(rightAttr.attribute.getRelationName())){
-						return right.getStatistics().getCardinality();
+						return right.getStatistics().getCardinality() * left.getStatistics().getCardinality() /	leftAttr.attribute.getStatistics().getUniqueValues();
+//						return right.getStatistics().getCardinality();
 				}
 				if(rightAttr.attribute.getKeyStatus()==KeyStatusEnum.Foreign
 					&& rightAttr.attribute.getReferencedAttributeName().equalsIgnoreCase(leftAttr.attribute.getName())
 					&& rightAttr.attribute.getReferencedTableName().equalsIgnoreCase(leftAttr.attribute.getRelationName())){
-						return left.getStatistics().getCardinality();
+						return left.getStatistics().getCardinality() * right.getStatistics().getCardinality() /	rightAttr.attribute.getStatistics().getUniqueValues();
+//						return left.getStatistics().getCardinality();
 					
 				}
 				return getAttributeOnAttributeSizeEstimation(cardinality, leftAttr.attribute, rightAttr.attribute, compPredicate.operator);

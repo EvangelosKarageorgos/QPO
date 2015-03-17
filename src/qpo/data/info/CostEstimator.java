@@ -147,6 +147,19 @@ public class CostEstimator {
 	
 	
 	
+	// Indexed BlockNested
+	public static Integer getJoinCostOfIndexedBlockNested(Integer blocksR, Integer estimatedRecsS){
+		return Catalog.getSystemProperties().getAverageLatency() + blocksR * Catalog.getSystemProperties().getTransferTime()  +  // R
+				Catalog.getSystemProperties().getAverageLatency() + estimatedRecsS * estimatedRecsS; // Indexed records of S
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	// Join Cost Estimator
@@ -155,6 +168,10 @@ public class CostEstimator {
 		Integer blocksR = joinNode.left.getTable().getStatistics().getBlocksOnDisk();
 		Integer blocksS = joinNode.right.getTable().getStatistics().getBlocksOnDisk();
 		
+//		JoinInfo joinInfo = getCheapestTableComposition(blocksR, blocksS);
+//		Integer estimatedRecsS = joinNode.right.getTable().getStatistics().getCardinality() /	joinNode.rightAttr.attribute.getStatistics().getUniqueValues();
+//		if( joinInfo.getCostTime()> getJoinCostOfIndexedBlockNested(blocksR, estimatedRecsS) )
+		 
 		return getCheapestTableComposition(blocksR, blocksS);
 	}
 	
@@ -211,9 +228,11 @@ public class CostEstimator {
 		case BlockLoopNested:
 			return getJoinCostOfBlockNested(blocksR, blocksS, blocksMem);
 		case IndexedBtreeJoin:
-			return getJoinCostOfBlockNested(blocksR, blocksS, blocksMem)+100; //TODO Btree estimation
+			return getJoinCostOfBlockNested(blocksR, blocksS, blocksMem)+100000; //TODO Btree estimation
 		case IndexedHashJoin:
-			return getJoinCostOfBlockNested(blocksR, blocksS, blocksMem)+100; //TODO Hash Estimation
+			return getJoinCostOfBlockNested(blocksR, blocksS, blocksMem)+100000; //TODO Hash Estimation
+//		case IndexedBlockNested:
+//			return getJoinCostOfIndexedBlockNested(blocksR, estimatedRecsOfS, blocksMem);
 		default:
 			return getJoinCostOfHash(blocksR, blocksS, blocksMem);
 		}

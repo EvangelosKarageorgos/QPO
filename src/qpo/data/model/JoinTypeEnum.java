@@ -2,6 +2,6 @@ package qpo.data.model;
 
 public enum JoinTypeEnum {
 
-	HashJoin, BlockLoopNested, MergeSort, IndexedBtreeJoin, IndexedHashJoin; 
+	HashJoin, BlockLoopNested, MergeSort, IndexedBtreeJoin, IndexedHashJoin, IndexedBlockNested; 
 	
 }
