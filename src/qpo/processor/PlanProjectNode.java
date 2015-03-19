@@ -264,6 +264,7 @@ public class PlanProjectNode extends PlanTableNode {
 					newProject.moveDownwardsOperation(0, 0);
 					//newProject.invalidate();
 					newProject.moveDownwards();
+					((PlanJoinNode)table).predicate.distributeAttributeReferences(((PlanJoinNode)table).left.getTable(), ((PlanJoinNode)table).right.getTable());
 				}
 			}
 			//if(!rightCanMove && !(((PlanJoinNode)table).right instanceof PlanRelationNode)){
@@ -285,6 +286,7 @@ public class PlanProjectNode extends PlanTableNode {
 					newProject.moveDownwardsOperation(0, 1);
 					//newProject.invalidate();
 					newProject.moveDownwards();
+					((PlanJoinNode)table).predicate.distributeAttributeReferences(((PlanJoinNode)table).left.getTable(), ((PlanJoinNode)table).right.getTable());
 				}
 			}
 			if(didMovement)
